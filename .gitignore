@@ -1,0 +1,15 @@
+*.log
+*.pyc
+data
+data/*
+__pycache__
+__pycache__/*
+__pycache__/
+last
+app/migrations
+app/migrations/*
+.idea
+.idea/*
+venv
+venv/*
+

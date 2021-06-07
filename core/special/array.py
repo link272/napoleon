@@ -1,0 +1,26 @@
+from napoleon.properties import Bytes
+import numpy as np
+from napoleon.tools.bson import to_bson, from_bson
+
+
+class Array(Bytes):
+
+    __slots__ = ()
+    _type = np.array
+
+    def system_default(self):
+        return Nothing
+
+    def to_string(self, value):
+        return json.dumps(value.tolist())
+
+    def from_string(self, value):
+        return np.array(json.loads(value))
+
+    def to_bytes(self, value):
+        return to_bson(value.tolist())
+
+    def from_bytes(self, value):
+        return np.array(from_bson(value))
+
+
