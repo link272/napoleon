@@ -5,7 +5,11 @@ import yaml
 
 def bash(command):
     output = subprocess.run(command, capture_output=True, encoding="utf-8", shell=True)
-    return output.stdout.splitlines()
+    if output.returncode != 0:
+        res = output.stderr.splitlines()
+    else:
+        res = output.stdout.splitlines()
+    return res
 
 
 def load_yml(filepath):

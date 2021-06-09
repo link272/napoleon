@@ -19,8 +19,8 @@ class CPU(AbstractObject):
 
 class RAM(AbstractObject):
 
-    total = Integer(psutil.virtual_memory().total)
-    available = Integer(psutil.virtual_memory().available)
+    total = Integer(int(psutil.virtual_memory().total))
+    available = Integer(int(psutil.virtual_memory().available))
 
     def usage(self): # noqa
         return psutil.virtual_memory().percent

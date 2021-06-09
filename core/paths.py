@@ -6,6 +6,7 @@ from napoleon.tools.singleton import exist
 from jinja2 import Template
 from pathlib import Path
 import yaml
+import os
 
 ROOT_DIRECTORY = Path(__file__).parent.parent
 
@@ -33,6 +34,7 @@ class Paths(AbstractObject, metaclass=MutableSingleton):
         t = Template(filepath.read_text())
         context["CWD_DIR"] = str(Path.cwd())
         context["ROOT_DIR"] = str(ROOT_DIRECTORY)
+        context.update(os.environ)
         config = t.render(context)
         return cls.deserialize(yaml.safe_load(config))
 

@@ -3,7 +3,7 @@ from napoleon.core.special.hidden import HiddenString
 import secrets
 from napoleon.properties import PlaceHolder, Alias, Boolean
 from napoleon.core.paths import PATHS, Path, FilePath
-from napoleon.core.network.http import HTTPQuery, HTTPSession
+from napoleon.core.network.http import HTTPQuery
 from napoleon.core.network.client import Client, CLIENTS
 
 from napoleon.core.daemon.server import ThreadedServer
@@ -47,13 +47,11 @@ class FlaskServer(ThreadedServer):
         self._thread.start()
 
     def _stop_thread(self):
-        shutdown_session = HTTPSession(client=self.server_client)
-        with shutdown_session:
-            shutdown_session.send(HTTPQuery(root=f"/shutdown/{self._shutdown_token}", method="POST"))
+        with self.server_client:
+            self.server_client.send(HTTPQuery(root=f"/shutdown/{self._shutdown_token}", method="POST"))
 
     def build_app(self):
         return self.build_base_app()
-
 
     def build_base_app(self):
         flask_app = Flask(__name__,

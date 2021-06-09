@@ -10,6 +10,7 @@ from .json_decoder import JSONDecoder
 class JSONMerger(BaseMerger):
 
     def __init__(self):
+        super().__init__()
         self.decoder = JSONDecoder()
 
     def _dispatch_update(self, _property, base, root):

@@ -3,7 +3,9 @@ from ..properties.instance import Instance
 from ..properties.scalars import Float, Integer, String, DateTime, JSON, UUID, Bytes, Boolean, Symbol
 from ..properties.metaclass import SlottedType
 from ..properties.base import PlaceHolder, recurse_iter_properties
-from ..tools.singleton import Nothing, Undefined, exist
+from ..tools.singleton import Nothing, Undefined, exist, is_define
+from ..tools.collection import get_child_class
+from ..properties.objects import AbstractObject
 import graphene
 import inspect
 import typing
@@ -40,14 +42,17 @@ class GraphQLModel(object):
         if isinstance(_property, Instance):
             name = self.build_type_name(_property.object_type, output=output)
             if name not in self.graph_classes:
-                self.graph_classes[name] = self._build_graph_type(_property.object_type, output=output)
+                _type = self._build_graph_type(_property.object_type, output=output)
+                for cls in get_child_class(_property.object_type):
+                    sub_name = self.build_type_name(cls, output=output)
+                    self.graph_classes[sub_name] = _type
             _type = self.graph_classes[name]
         elif isinstance(_property, (List, Set)):
-            _type = self._build_sequence_type(_property)
+            _type = self._build_sequence_type(_property, output=output)
         elif isinstance(_property, Map):
-            _type = self._build_mapping_type(_property)
+            _type = self._build_mapping_type(_property, output=output)
         elif isinstance(_property, Integer):
-            _type = graphene.Int
+            _type = graphene.types.scalars.BigInt
         elif isinstance(_property, Float):
             _type = graphene.Float
         elif isinstance(_property, DateTime):
@@ -74,10 +79,10 @@ class GraphQLModel(object):
         return graphene.List(self._dispatch(_property.item_type, output=output))
 
     def _build_mapping_type(self, _property, output=True):
-        kv_name = _property.__class__.__name__ + "Map"
+        kv_name = str(_property.item_type) + "Map"
         if kv_name not in self.map_classes:
             self.map_classes[kv_name] = (
-                SlottedType(kv_name, (object,), {"key": String(), "value": _property}),
+                SlottedType(kv_name, (AbstractObject,), {"key": String(), "value": _property.item_type}),
                 _property)
         return self._build_sequence_type(List(Instance(self.map_classes[kv_name][0])), output=output)
 
@@ -100,14 +105,15 @@ class GraphQLModel(object):
         for key, _prop in recurse_iter_properties(object_type):
             attr_type = self._dispatch(_prop, output=output)
             if exist(attr_type):
+                desc = _prop.description if is_define(_prop.description) else ""
                 if output:
                     attr[key] = graphene.Field(attr_type,
-                                               description=_prop.description,
+                                               description=desc,
                                                required=False,
                                                default_value=None)
                 else:
                     attr[key] = graphene.InputField(attr_type,
-                                                    description=_prop.description,
+                                                    description=desc,
                                                     required=False,
                                                     default_value=Undefined)
 

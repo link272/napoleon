@@ -1,4 +1,4 @@
-from napoleon.properties import MutableSingleton, Instance, Map, String
+from napoleon.properties import MutableSingleton, Instance, Map, String, PlaceHolder
 from napoleon.core.trace import Logger, LOGGERS
 from napoleon.core.network.client import CLIENTS, Client
 from napoleon.core.storage.database import DATABASES, Database
@@ -28,40 +28,37 @@ class Application(Configurable, metaclass=MutableSingleton):
     vault = Instance(Vault, default=VAULT)
     warning_filter: str = String("ignore")
     daemons: dict = Map(Instance(Daemon))
+    _is_running = PlaceHolder()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        signal.signal(signal.SIGUSR1, self.reload)  # 12
+        signal.signal(signal.SIGUSR1, self.reload)  # 10
+        signal.signal(signal.SIGUSR2, self.terminate)  # 12
 
     def _build_internal(self):
         warnings.filterwarnings(self.warning_filter)
 
-    def _clean_internal(self):
-        self.shutdown()
-
     def reload(self, signum, frame): # noqa
         self.log.info(f"Receiving signal {signum}, reloading")
         for name, module in sys.modules.copy().items():
-            if name.startswith("core") and not name.startswith("core.share.schema"):
+            if name.startswith("core"):
                 importlib.reload(module)
 
-    def shutdown(self):
-        for daemon in self.daemons.values():
-            daemon.shutdown()
-
-    def start(self):
-        for daemon in self.daemons.values():
-            daemon.start()
+    def terminate(self, signum, frame): # noqa
+        self.log.info(f"Receiving signal {signum}, stopping")
+        self._is_running = False
 
     def run(self):
-        self.start()
-        loop = True
-        while loop:
+        for daemon in self.daemons.values():
+            daemon.start()
+        self._is_running = True
+        while self._is_running:
             try:
                 time.sleep(2)
             except KeyboardInterrupt:
-                loop = False
-        self.shutdown()
+                self._is_running = False
+        for daemon in self.daemons.values():
+            daemon.shutdown()
 
     @classmethod
     def deserialize(cls, instance):

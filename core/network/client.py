@@ -61,10 +61,9 @@ class Client(AbstractObject):
         try:
             s.connect((self.host, self.port))
         except Exception as e:
-            self.log.warning(f"{self.host}:{self.port} is not up: {e}")
+            self.log.warning(f"{self.host}:{self.port} is down: {e}")
         else:
             self.is_active = True
-            self.log.info(f"{self.host}:{self.port} is up")
         finally:
             s.close()
         return self.is_active

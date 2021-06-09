@@ -39,19 +39,19 @@ class GrapQLViewBuilder(AbstractObject):
         class UpdateMutation(graphene.Mutation):
 
             class Arguments:
-                root = model.input_root
+                head = graphene.Argument(model.input_root)
 
             ok = graphene.Boolean()
 
             @staticmethod
-            def mutate(_root, info, root):
+            def mutate(_root, info, head):
                 ok = True
                 try:
-                    merger.decode_update(info.context.get("context"), root)
+                    merger.decode_update(info.context.get("context"), head)
                 except Exception as e:
                     self.log.error(f"Error while updating the object: {instance}, {e}")
                     ok = False
-                return ComponentUpdate(ok=ok)  # noqa
+                return UpdateMutation(ok=ok)  # noqa
 
         class Mutator(graphene.ObjectType):
 
@@ -59,11 +59,11 @@ class GrapQLViewBuilder(AbstractObject):
 
         schema = graphene.Schema(query=Query,
                                  mutation=Mutator,
-                                 types=list(model.map_classes.values()),
+                                 types=list(model.graph_classes.values()),
                                  auto_camelcase=self.auto_camelcase)
 
         return ContextedGraphQLView.as_view(endpoint,
-                                            schema=schema,
+                                            schema=schema.graphql_schema,
                                             pretty=self.pretty,
                                             graphiql=self.graphiql,
                                             context=instance)

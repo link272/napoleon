@@ -10,6 +10,7 @@ from .graph_decoder import GraphQLDecoder
 class GraphQLMerger(BaseMerger):
 
     def __init__(self, model):
+        super().__init__()
         self.model = model
         self.decoder = GraphQLDecoder(model)
 

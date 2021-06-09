@@ -5,18 +5,24 @@ from napoleon.generators.json_schema import JSONSchema
 import yaml
 from jinja2 import Template
 from jsonmerge import Merger
+import os
 
 
 class Configurable(AbstractObject):
 
     @classmethod
     def from_config(cls, name, context):
-        template = Template((PATHS.templates / Path(name + ".yml.j2")).read_text())
+        context.update(os.environ)
+        base_template = Template((PATHS.templates / Path(name + ".yml.j2")).read_text())
 
-        base_string = template.render(context)
+        base_string = base_template.render(context)
 
         base = yaml.safe_load(base_string)
-        head = yaml.safe_load((PATHS.config / Path(name + ".yml")).read_text())
+        head_template = Template((PATHS.config / Path(name + ".yml")).read_text())
+
+        head_string = head_template.render(context)
+
+        head = yaml.safe_load(head_string)
 
         merger = Merger(JSONSchema().generate_schema(cls))
         config = merger.merge(base, head)

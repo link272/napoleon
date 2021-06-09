@@ -2,6 +2,7 @@ import hashlib
 from ..properties import Instance, List, Set, Map, Integer, Float, DateTime, Boolean, String, Bytes, SlottedType, Symbol
 from ..properties.base import recurse_iter_properties, PlaceHolder
 from ..tools.singleton import Nothing, exist, is_define, Undefined
+from ..properties.objects import AbstractObject
 import subprocess
 import importlib
 import sys
@@ -109,9 +110,9 @@ class ProtobufModel(object):
         return _type
 
     def _build_mapping_type(self, _property):
-        kv_name = _property.__class__.__name__ + "Map"
+        kv_name = str(_property.item_type) + "Map"
         if kv_name not in self.map_classes:
             self.map_classes[kv_name] = (
-                SlottedType(kv_name, (object,), {"key": String(), "value": _property}),
+                SlottedType(kv_name, (AbstractObject,), {"key": String(), "value": _property.item_type}),
                 _property)
-        return self._dispatch(List(Instance(self.map_classes[kv_name])))
+        return self._dispatch(List(Instance(self.map_classes[kv_name][0])))

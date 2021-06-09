@@ -55,6 +55,6 @@ class ProtobufEncoder(BaseEncoder):
         return [self._dispatch(_property.item_type, v) for v in base]
 
     def _encode_mapping(self, _property, base):
-        name = _property.__class__.__name__ + "Map"
+        name = str(_property.item_type) + "Map"
         _type = self.model.map_classes[name][0]
         return [self._dispatch(Instance(_type), _type(key=k, value=v)) for k, v in base.items()]

@@ -22,7 +22,7 @@ class SecureFlaskServer(PersistentFlaskServer):
         return hashlib.pbkdf2_hmac(self.pbkdf2_algorithm, password.encode(), salt, self.pbkdf2_iteration)
 
     def build_app(self):
-	app = super().build_app()
+        app = super().build_app()
         return self.build_auth_layer(app)
 
     def build_auth_layer(self, flask_app):
