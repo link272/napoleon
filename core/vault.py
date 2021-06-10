@@ -1,6 +1,7 @@
 from napoleon.core.special.hidden import HiddenBytes
-from napoleon.core.cmd import CMD
+from napoleon.core.cmd import CommandLine
 from napoleon.properties import MutableSingleton, AbstractObject, String
+from napoleon.tools.singleton import exist
 
 import os
 from cryptography.fernet import Fernet
@@ -14,7 +15,10 @@ class Vault(AbstractObject, metaclass=MutableSingleton):
     key: bytes = HiddenBytes(Fernet.generate_key)
 
     @classmethod
-    def from_password(cls, password: str, salt: str, iterations=1000000, algorithm="sha256"):
+    def from_password(cls, password: str,
+                      salt="3pbXWxkVxUV7K5Uq1rGqhQ==",
+                      iterations=1000000,
+                      algorithm="sha256"):
         key = base64.urlsafe_b64encode(hashlib.pbkdf2_hmac(algorithm,
                                                            password.encode(),
                                                            base64.urlsafe_b64decode(salt.encode()),
@@ -39,17 +43,25 @@ class Vault(AbstractObject, metaclass=MutableSingleton):
     def is_authorized(self, key):
         return hmac.compare_digest(self.key, key)
 
+    @classmethod
+    def from_cmd(cls):
+        cmd = CommandLine.from_cmd()
+        if exist(cmd.secret_key):
+            vault = cls(key=base64.urlsafe_b64decode(cmd.secret_key.encode()))
+        elif exist(cmd.password):
+            vault = cls.from_password(cmd.password)
+        else:
+            vault = Vault()
+        return vault
 
-if CMD.password and CMD.salt:
-    VAULT = Vault.from_password(CMD.password, CMD.salt)
-else:
-    VAULT = Vault()
+
+Vault.from_cmd()
 
 
 class Secret(String):
 
     def from_string(self, value):
-        return VAULT.decrypt(value)
+        return Vault().decrypt(value)
 
     def to_string(self, value):
-        return VAULT.encrypt(value)
+        return Vault().encrypt(value)

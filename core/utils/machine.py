@@ -56,7 +56,7 @@ class Platform(AbstractObject, metaclass=Singleton):
         return sha1_ref
 
 
-PLATFORM = Platform.from_platform()
+Platform.from_platform()
 
 
 class Monitoring(BaseAction):
@@ -64,4 +64,4 @@ class Monitoring(BaseAction):
     logger_name = String(default="default")
 
     def execute(self, context): # noqa
-        self.log.info(f"|cpu|{PLATFORM.cpu.usage()}|ram|{PLATFORM.ram.usage()}")
+        self.log.info(f"|cpu|{Platform().cpu.usage()}|ram|{Platform().ram.usage()}")

@@ -2,11 +2,11 @@ from napoleon.properties import MutableSingleton, Instance, Map, String, PlaceHo
 from napoleon.core.trace import Logger, LOGGERS
 from napoleon.core.network.client import CLIENTS, Client
 from napoleon.core.storage.database import DATABASES, Database
-from napoleon.core.utils.machine import Platform, PLATFORM
-from napoleon.core.cmd import CommandLine, CMD
+from napoleon.core.utils.machine import Platform
+from napoleon.core.cmd import CommandLine
 from napoleon.core.utils.config import Configurable
 from napoleon.core.paths import Paths, PATHS
-from napoleon.core.vault import Vault, VAULT
+from napoleon.core.vault import Vault
 from napoleon.core.daemon.base import Daemon
 from napoleon.decoders.json_decoder import JSONDecoder
 import sys
@@ -23,9 +23,9 @@ class Application(Configurable, metaclass=MutableSingleton):
     paths = Instance(Paths, default=PATHS)
     clients = Map(Instance(Client), default=CLIENTS)
     databases = Map(Instance(Database), default=DATABASES)
-    platform = Instance(Platform, default=PLATFORM)
-    cmd = Instance(CommandLine, default=CMD)
-    vault = Instance(Vault, default=VAULT)
+    platform = Instance(Platform, default=Platform())
+    cmd = Instance(CommandLine, default=CommandLine())
+    vault = Instance(Vault, default=Vault())
     warning_filter: str = String("ignore")
     daemons: dict = Map(Instance(Daemon))
     _is_running = PlaceHolder()

@@ -1,6 +1,6 @@
 from napoleon.core.special.path import FilePath
 from napoleon.properties import AbstractObject, MutableSingleton, iter_properties
-from napoleon.core.cmd import CMD
+from napoleon.core.cmd import CommandLine
 from napoleon.tools.regex import to_snake
 from napoleon.tools.singleton import exist
 from jinja2 import Template
@@ -30,13 +30,19 @@ class Paths(AbstractObject, metaclass=MutableSingleton):
                     _path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
-    def from_config_filepath(cls, filepath, context):
-        t = Template(filepath.read_text())
-        context["CWD_DIR"] = str(Path.cwd())
-        context["ROOT_DIR"] = str(ROOT_DIRECTORY)
-        context.update(os.environ)
-        config = t.render(context)
-        return cls.deserialize(yaml.safe_load(config))
+    def from_cmd(cls):
+        cmd = CommandLine.from_cmd()
+        if exist(cmd.paths_config_file):
+            t = Template(cmd.paths_config_file.read_text())
+            context = cmd.serialize()
+            context["CWD_DIR"] = str(Path.cwd())
+            context["ROOT_DIR"] = str(ROOT_DIRECTORY)
+            context.update(os.environ)
+            config = t.render(context)
+            paths = cls.deserialize(yaml.safe_load(config))
+        else:
+            paths = cls()
+        return paths
 
     def build_data_filepath(self, stem, ext, bucket=""):
         parents = self.data / Path(to_snake(bucket))
@@ -45,7 +51,4 @@ class Paths(AbstractObject, metaclass=MutableSingleton):
         return parents / Path(to_snake(stem) + "." + ext)
 
 
-if exist(CMD.paths_config_file):
-    PATHS = Paths.from_config_filepath(CMD.paths_config_file, CMD.serialize())
-else:
-    PATHS = Paths()
+PATHS = Paths.from_cmd()

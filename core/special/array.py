@@ -1,6 +1,8 @@
 from napoleon.properties import Bytes
 import numpy as np
 from napoleon.tools.bson import to_bson, from_bson
+from napoleon.tools.singleton import Nothing
+import json
 
 
 class Array(Bytes):

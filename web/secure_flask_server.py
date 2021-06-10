@@ -10,7 +10,6 @@ import hmac
 import os
 import hashlib
 from napoleon.web.persistent_flask_server import PersistentFlaskServer
-from napoleon.core.storage.database import Database, DATABASES
 
 
 class SecureFlaskServer(PersistentFlaskServer):

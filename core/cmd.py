@@ -14,6 +14,8 @@ Options:
   -h --help
   -v --version
   -c paths_config_file --paths_config_file=paths_config_file
+  -p password
+  -k secret_key
   -d --allow_db"""
 
 
@@ -23,8 +25,8 @@ class CommandLine(AbstractObject, metaclass=MutableSingleton):
     allow_db = Boolean()
     version = Boolean()
     help = Boolean()
+    secret_key = HiddenString()
     password = HiddenString("artemis")
-    salt = HiddenString("3pbXWxkVxUV7K5Uq1rGqhQ==")
 
     @classmethod
     def from_cmd(cls):
@@ -45,6 +47,3 @@ class CommandLine(AbstractObject, metaclass=MutableSingleton):
                 if value:
                     args[key] = value
         return cls.deserialize(args)
-
-
-CMD = CommandLine.from_cmd()
