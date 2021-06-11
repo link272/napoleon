@@ -29,6 +29,8 @@ class HTTPClient(Client):
         with self.lock:
             if not exist(self._session):
                 self._session = requests.Session()
+                self._session.auth = self.to_auth()
+                self._session.verify = self.verify
             self._active_interfaces += 1
 
     def refresh(self):
@@ -36,6 +38,8 @@ class HTTPClient(Client):
             self._session.close()
             self.check_activity()
             self._session = requests.Session()
+            self._session.auth = self.to_auth()
+            self._session.verify = self.verify
 
     def send(self, query, data=None, files=None, json=None):
         self.wait_for_activity()
@@ -47,9 +51,7 @@ class HTTPClient(Client):
                                          data=data,
                                          json=json,
                                          headers=query.headers,
-                                         auth=self.to_auth(),
                                          timeout=(self.socket_timeout, query.read_timeout),
-                                         verify=self.verify,
                                          files=files)
         try:
             response.raise_for_status()

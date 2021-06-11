@@ -1,6 +1,6 @@
 from napoleon.properties import AbstractObject, Boolean, MutableSingleton
 from napoleon.core.special.hidden import HiddenString
-from napoleon.core.special.path import FilePath, Path
+from napoleon.core.special.path import FilePath
 from napoleon.tools.collection import first
 
 from docopt import docopt

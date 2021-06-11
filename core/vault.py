@@ -1,7 +1,7 @@
 from napoleon.core.special.hidden import HiddenBytes
 from napoleon.core.cmd import CommandLine
 from napoleon.properties import MutableSingleton, AbstractObject, String
-from napoleon.tools.singleton import exist
+from napoleon.tools.singleton import exist, is_define
 
 import os
 from cryptography.fernet import Fernet
@@ -46,9 +46,9 @@ class Vault(AbstractObject, metaclass=MutableSingleton):
     @classmethod
     def from_cmd(cls):
         cmd = CommandLine.from_cmd()
-        if exist(cmd.secret_key):
+        if cmd.secret_key:
             vault = cls(key=base64.urlsafe_b64decode(cmd.secret_key.encode()))
-        elif exist(cmd.password):
+        elif cmd.password:
             vault = cls.from_password(cmd.password)
         else:
             vault = Vault()
