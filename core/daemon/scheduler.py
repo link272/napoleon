@@ -72,7 +72,6 @@ class Scheduler(Daemon, metaclass=MutableSingleton):
                                  coalesce=cron.coalesce,
                                  max_instances=cron.max_instances,
                                  replace_existing=True)
-        self.start()
 
     def _clean_internal(self):
         self.stop()

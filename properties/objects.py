@@ -46,7 +46,7 @@ class AbstractObject(object, metaclass=SlottedType):
 
     @property
     def log(self):
-        return logging.getLogger(getattr(self, "logger_name", None))
+        return logging.getLogger(getattr(self, "logger_name", "default"))
 
     def __del__(self):
         self._clean_internal()

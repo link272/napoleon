@@ -22,7 +22,9 @@ def configure(cmd_class=CommandLine):
     cmd = cmd_class.from_cmd(add_help=True)
     paths = Paths.from_config(cmd.paths_config_file, cmd.serialize())
     vault = Vault.from_base64_key(paths.vault.read_text())
-    app = Application.from_config(Application.__name__.lower(), cmd.serialize())
+    context = cmd.serialize()
+    context.update(paths.serialize())
+    app = Application.from_config(Application.__name__.lower(), context)
     app.cmd = cmd
     app.paths = paths
     app.vault = vault

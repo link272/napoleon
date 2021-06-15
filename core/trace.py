@@ -14,8 +14,7 @@ class Logger(AbstractObject):
     def _clean_internal(self):
         logger = logging.getLogger(self.name)
         while logger.hasHandlers():
-            if logger.hasHandlers():
-                logger.removeHandler(logger.handlers[0])
+            logger.removeHandler(logger.handlers[0])
 
 
 class FileLogger(Logger):
