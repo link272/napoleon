@@ -2,12 +2,10 @@ from .metaclass import SlottedType
 import copy
 from .scalars import String
 from .base import iter_properties
-from ..tools.log import LOGGERS, PrintLogger
 from ..encoders.json_encoder import JSONEncoder
 from ..encoders.hash_encoder import HashEncoder
 from ..decoders.json_decoder import JSONDecoder
-
-PRINT_LOGGER = PrintLogger()
+import logging
 
 
 class AbstractObject(object, metaclass=SlottedType):
@@ -48,7 +46,7 @@ class AbstractObject(object, metaclass=SlottedType):
 
     @property
     def log(self):
-        return LOGGERS.get(getattr(self, "logger_name", "default"), PRINT_LOGGER)
+        return logging.getLogger(getattr(self, "logger_name", None))
 
     def __del__(self):
         self._clean_internal()

@@ -10,6 +10,9 @@ class Scalar(Property):  # noqa
 
     __slots__ = ()
 
+    def from_string(self, value):
+        raise NotImplementedError
+
 
 class Boolean(Scalar):
 
@@ -18,6 +21,9 @@ class Boolean(Scalar):
 
     def system_default(self):
         return False
+
+    def from_string(self, value):
+        raise NotImplementedError
 
 
 class Float(Scalar):
@@ -46,6 +52,9 @@ class Float(Scalar):
     def system_default(self):
         return 0.0
 
+    def from_string(self, value):
+        return float(value)
+
 
 class Integer(Float):
 
@@ -55,6 +64,8 @@ class Integer(Float):
     def system_default(self):
         return 0
 
+    def from_string(self, value):
+        return int(value)
 
 class Symbol(Scalar):  # noqa
 
@@ -74,9 +85,6 @@ class Symbol(Scalar):  # noqa
         self.format = format
 
     def to_string(self, value):
-        raise NotImplementedError
-
-    def from_string(self, value):
         raise NotImplementedError
 
 
@@ -127,10 +135,10 @@ class Bytes(Symbol):
         return b""
 
     def to_string(self, value):
-        return self.to_bytes(value).decode("ascii")
+        return self.to_bytes(value).decode()
 
     def from_string(self, value):
-        return self.from_bytes(value.encode("ascii"))
+        return self.from_bytes(value.encode())
 
     def to_bytes(self, value):
         return base64.urlsafe_b64encode(value)

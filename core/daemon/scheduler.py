@@ -1,5 +1,5 @@
 from napoleon.properties import Boolean, String, Integer, PlaceHolder, Map, MutableSingleton, Instance, AbstractObject,\
-    iter_properties, JSON
+    iter_properties
 from napoleon.core.tasks.graph_machine import BaseAction
 from napoleon.core.daemon.base import Daemon
 from napoleon.tools.singleton import Nothing

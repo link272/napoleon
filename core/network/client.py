@@ -1,33 +1,13 @@
-from napoleon.properties import Alias, AbstractObject, String, Integer, Float, Instance, PlaceHolder, Boolean, List
+from napoleon.properties import AbstractObject, String, Integer, Float, Instance, PlaceHolder
 from napoleon.core.utils.timer import Timer, timeout
 from napoleon.core.vault import Secret
-from napoleon.core.paths import PATHS, FilePath, Path
 from napoleon.tools.context import temporary_state
-from napoleon.core.tasks.graph_machine import BaseAction, EXIT, DEFAULT
-from napoleon.tools.collection import empty
 
 import threading
 import urllib3
 import socket
 
 urllib3.disable_warnings()
-
-
-CLIENTS = {}
-
-
-class CheckService(BaseAction):
-
-    client_names = List(String())
-    timer = Instance(Timer, default=Timer)
-
-    def execute(self, context):
-        for name, client in CLIENTS.items():
-            if empty(self.client_names) or name in self.client_names:
-                with temporary_state(client, timer=self.timer):
-                    if not client.check_activity():
-                        self.log.error(f"Service {name} is down")
-        return DEFAULT
 
 
 class ServiceDownException(Exception):
@@ -42,14 +22,13 @@ class Client(AbstractObject):
     port = Integer(443)
     user = String()
     password = Secret()
-    timer = Instance(Timer, default=Timer)
+    timer: Timer = Instance(Timer, default=Timer)
     socket_timeout: int = Float(5.)
     service_timeout: int = Float(3600)
     _active_flag = PlaceHolder()
     lock = PlaceHolder()
 
     def _build_internal(self):
-        CLIENTS[self.name] = self
         self._active_flag = threading.Event()
         self.lock = threading.RLock()
 

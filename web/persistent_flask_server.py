@@ -1,13 +1,14 @@
-from napoleon.properties import Integer, Alias
+from napoleon.properties import Alias
 from napoleon.web.flask_server import FlaskServer
-from napoleon.core.storage.database import Database, DATABASES
+from napoleon.core.storage.database import Database
 from pony.orm import db_session
 from flask import request
+from napoleon.core.application import Application
 
 
 class PersistentFlaskServer(FlaskServer):
 
-    database = Alias(Database, DATABASES)
+    database = Alias(Database, lambda: Application().databases)
 
     def _build_internal(self):
         super()._build_internal() # noqa

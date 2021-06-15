@@ -8,14 +8,14 @@ lock = threading.RLock()
 
 class Lazy(object):
 
-    __slots__ = ("hash_map", "hidden_name")
+    __slots__ = ("hash_map_ref", "hidden_name")
 
-    def __init__(self, hash_map, name):
-        self.hash_map = hash_map
+    def __init__(self, hash_map_ref, name):
+        self.hash_map_ref = hash_map_ref
         self.hidden_name = "_" + name
 
     def __get__(self, instance, owner):
-        return self.hash_map.get(getattr(instance, self.hidden_name), Nothing)
+        return self.hash_map_ref().get(getattr(instance, self.hidden_name), Nothing)
 
     def __set__(self, instance, value):
         setattr(instance, self.hidden_name, value)
@@ -42,7 +42,7 @@ class SlottedType(type):
 
         for _name in field_names:
             if isinstance(properties[_name], Alias):
-                _dict[_name] = Lazy(properties[_name].item_map, _name)
+                _dict[_name] = Lazy(properties[_name].hash_map_ref, _name)
                 _dict["__slots__"].remove(_name)
                 _dict["__slots__"].add("_" + _name)
             else:

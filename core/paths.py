@@ -1,54 +1,42 @@
 from napoleon.core.special.path import FilePath
 from napoleon.properties import AbstractObject, MutableSingleton, iter_properties
-from napoleon.core.cmd import CommandLine
 from napoleon.tools.regex import to_snake
 from napoleon.tools.singleton import exist
 from jinja2 import Template
 from pathlib import Path
 import yaml
-import os
-
-ROOT_DIRECTORY = Path(__file__).parent.parent
+import uuid
+import shutil
 
 
 class Paths(AbstractObject, metaclass=MutableSingleton):
 
-    root = FilePath(default=ROOT_DIRECTORY, description="source directory")
-    templates = FilePath(default=ROOT_DIRECTORY / Path("templates"), description="templates directory")
-    static = FilePath(default=ROOT_DIRECTORY / Path("static"), description="static directory")
-    data: Path = FilePath(default=Path.cwd(), description="data directory")
-    temporary = FilePath(default=Path("/tmp"), description="temporary directory")
-    log = FilePath(default=Path.cwd() / Path("logs"), description="log directory")
-    config = FilePath(default=ROOT_DIRECTORY / Path("config"), description="config directory")
-    docs = FilePath(default=ROOT_DIRECTORY / Path("docs"), description="docs filepath")
+    root = FilePath(default=Path(__file__).parent.parent, description="source directory")
+    templates = FilePath(description="templates directory")
+    static = FilePath(description="static directory")
+    data: Path = FilePath(description="data directory")
+    temporary = FilePath(default=Path("/tmp/" + str(uuid.uuid4())), description="temporary directory")
+    log = FilePath(description="log directory")
+    config = FilePath(description="config directory")
+    docs = FilePath(description="docs directory")
+    vault = FilePath(description="secret filepath")
 
     def _build_internal(self):
         for key, field in iter_properties(self.__class__):
             if isinstance(field, FilePath):
                 _path = getattr(self, key)
-                if exist(_path):
-                    _path.mkdir(parents=True, exist_ok=True)
+                if exist(_path) and not _path.exists():
+                    _path.mkdir(parents=True)
 
     @classmethod
-    def from_cmd(cls):
-        cmd = CommandLine.from_cmd()
-        if exist(cmd.paths_config_file):
-            t = Template(cmd.paths_config_file.read_text())
-            context = cmd.serialize()
-            context["CWD_DIR"] = str(Path.cwd())
-            context["ROOT_DIR"] = str(ROOT_DIRECTORY)
-            context.update(os.environ)
-            config = t.render(context)
-            paths = cls.deserialize(yaml.safe_load(config))
-        else:
-            paths = cls()
-        return paths
+    def from_config(cls, path, context):
+        template = Template(path.read_text())
+        context["cwd"] = str(Path.cwd())
+        config = template.render(context)
+        return cls.deserialize(yaml.safe_load(config))
 
     def build_data_filepath(self, stem, ext, bucket=""):
         parents = self.data / Path(to_snake(bucket))
         if not parents.exists():
             parents.mkdir(parents=True, exist_ok=True)
         return parents / Path(to_snake(stem) + "." + ext)
-
-
-PATHS = Paths.from_cmd()

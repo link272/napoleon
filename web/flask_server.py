@@ -2,10 +2,10 @@ from flask import Flask, request
 from napoleon.core.special.hidden import HiddenString
 import secrets
 from napoleon.properties import PlaceHolder, Alias, Boolean
-from napoleon.core.paths import PATHS, Path, FilePath
+from napoleon.core.paths import Paths, Path, FilePath
 from napoleon.core.network.http import HTTPQuery
-from napoleon.core.network.client import Client, CLIENTS
-
+from napoleon.core.network.client import Client
+from napoleon.core.application import Application
 from napoleon.core.daemon.server import ThreadedServer
 from napoleon.tools.singleton import exist
 
@@ -17,12 +17,12 @@ class FlaskServer(ThreadedServer):
     secret_key = HiddenString(secrets.token_urlsafe)
     _shutdown_token = HiddenString(secrets.token_urlsafe)
     app = PlaceHolder()
-    server_client = Alias(Client, CLIENTS)
+    server_client = Alias(Client, lambda: Application().clients)
     debug = Boolean(default=True)
-    key_filepath = FilePath(PATHS.docs / Path("crt.pem"))
-    crt_filepath = FilePath(PATHS.docs / Path("crt.pem"))
-    template_folder = FilePath(PATHS.templates)
-    static_folder = FilePath(PATHS.static)
+    key_filepath = FilePath(lambda: Paths().docs / Path("crt.pem"))
+    crt_filepath = FilePath(lambda: Paths().docs / Path("crt.pem"))
+    template_folder = FilePath(lambda: Paths().templates)
+    static_folder = FilePath(lambda: Paths().static)
 
     def _build_internal(self):
         self.app = self.build_app()

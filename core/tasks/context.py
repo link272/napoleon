@@ -1,5 +1,5 @@
 from napoleon.properties import UUID, DateTime, Set, String, Instance, PlaceHolder, Boolean
-from napoleon.core.paths import PATHS, Path
+from napoleon.core.paths import Path, Paths
 from napoleon.core.utils.config import Configurable
 from napoleon.tools.regex import to_snake
 from napoleon.core.tasks.graph_machine import GraphMachine
@@ -35,7 +35,7 @@ class Context(Configurable):
         raise NotImplementedError
 
     def build_context_directory(self, bucket=""):
-        parents = PATHS.data / Path(str(self.key)) / Path(to_snake(bucket))
+        parents = Paths().data / Path(str(self.key)) / Path(to_snake(bucket))
         if not parents.exists():
             parents.mkdir(parents=True, exist_ok=True)
         return parents

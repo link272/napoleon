@@ -1,5 +1,5 @@
 from napoleon.properties import AbstractObject, String, Integer, Float, Instance, Singleton
-from napoleon.core.paths import PATHS
+from napoleon.core.paths import Paths
 from napoleon.core.tasks.graph_machine import BaseAction
 import platform as plt
 import subprocess
@@ -48,15 +48,12 @@ class Platform(AbstractObject, metaclass=Singleton):
     def git_commit_id(self):
         sha1_ref = ""
         try:
-            res = subprocess.run(["git", "-C", str(PATHS.root), "show-ref", "--head", "HEAD"], capture_output=True)
+            res = subprocess.run(["git", "-C", str(Paths().root), "show-ref", "--head", "HEAD"], capture_output=True)
             if res.returncode == 0:
                 sha1_ref = res.stdout.decode().split("\n")[0].split(" ")[0]
         except Exception as ex:
             self.log.error(f"Unable to get the git commit ID: {ex}")
         return sha1_ref
-
-
-Platform.from_platform()
 
 
 class Monitoring(BaseAction):

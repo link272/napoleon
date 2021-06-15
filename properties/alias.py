@@ -7,7 +7,7 @@ class Alias(String):
 
     def __init__(self,
                  item_type,
-                 item_map,
+                 hash_map_ref,
                  *,
                  default=Intrinsic,
                  description=Undefined,
@@ -15,7 +15,7 @@ class Alias(String):
         super().__init__(default=default,
                          description=description,
                          nullable=nullable)
-        self.item_map = item_map
+        self.hash_map_ref = hash_map_ref
         self.item_type = item_type
 
     def __eq__(self, other):
@@ -31,7 +31,7 @@ class Alias(String):
         return Nothing
 
     def to_string(self, value):
-        return invert_map(self.item_map)[value]
+        return invert_map(self.hash_map_ref())[value]
 
     def from_string(self, value):
         return value

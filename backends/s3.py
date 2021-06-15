@@ -1,14 +1,10 @@
 import boto3
-import datetime
 
 import pendulum
-from napoleon.core.network.http import HTTPClient, HTTPInterface
+from napoleon.core.network.http import HTTPClient
 from napoleon.core.network.interface import Interface
-from napoleon.core.utils.encoders import Transformer, Content
-from napoleon.core.utils.retry import Retrier, retry
-from napoleon.properties import Boolean, DateTime, Integer, String, Map, List, AbstractObject, Set, Instance, \
-    PlaceHolder
-from napoleon.tools.singleton import exist, Nothing
+from napoleon.core.utils.encoders import Content
+from napoleon.properties import DateTime, Integer, String, AbstractObject, PlaceHolder
 
 
 class S3Client(HTTPClient):
@@ -73,7 +69,7 @@ class S3Interface(Interface):
                 self.client.boto_client.list_objects_v2(Bucket=bucket, Prefix=prefix).get("Contents", [])]
 
     def head(self, bucket, key):
-        return S3Object.from_object(key, bucket, self.client.boto_client.head_object(Bucket=bucket, Key=key), self.client_name)
+        return S3Object.from_object(key, bucket, self.client.boto_client.head_object(Bucket=bucket, Key=key), self.client.name)
 
     def upload(self, path, bucket, key):
         self.client.boto_client.upload_file(path, bucket, key)
