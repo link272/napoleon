@@ -1,7 +1,6 @@
 from flask import Flask, request
-from napoleon.core.special.hidden import HiddenString
 import secrets
-from napoleon.properties import PlaceHolder, Alias, Boolean
+from napoleon.properties import PlaceHolder, Alias, Boolean, String
 from napoleon.core.paths import Paths, Path, FilePath
 from napoleon.core.network.http import HTTPQuery
 from napoleon.core.network.client import Client
@@ -14,8 +13,8 @@ import threading
 
 class FlaskServer(ThreadedServer):
 
-    secret_key = HiddenString(secrets.token_urlsafe)
-    _shutdown_token = HiddenString(secrets.token_urlsafe)
+    secret_key = String(default=secrets.token_urlsafe)
+    _shutdown_token = PlaceHolder(default=secrets.token_urlsafe)
     app = PlaceHolder()
     server_client = Alias(Client, lambda: Application().clients)
     debug = Boolean(default=True)

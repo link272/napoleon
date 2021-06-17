@@ -62,8 +62,20 @@ class Application(Configurable, metaclass=MutableSingleton):
 
     @classmethod
     def deserialize(cls, instance):
-        serialized_daemons = instance.pop("daemons")
+        serialized_daemons = instance.pop("daemons", {})
         app = JSONDecoder().decode(instance, cls)
         for k, v in serialized_daemons.items():
             app.daemons[k] = JSONDecoder().decode(v, Daemon)
+        return app
+
+    @classmethod
+    def from_cmd(cls, cmd_class=CommandLine):
+        cmd = cmd_class.from_cmd(add_help=True)
+        paths = Paths.from_config(cmd.paths_config_file, cmd.serialize())
+        vault = Vault.from_base64_key(paths.vault.read_text())
+        app = Application.from_config(Application.__name__.lower(), {
+            "cmd": cmd.serialize(),
+            "paths": paths.serialize(),
+            "vault": vault.serialize()
+        })
         return app

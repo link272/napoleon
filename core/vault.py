@@ -1,5 +1,4 @@
-from napoleon.core.special.hidden import HiddenBytes
-from napoleon.properties import MutableSingleton, AbstractObject, String
+from napoleon.properties import MutableSingleton, AbstractObject, String, Bytes
 
 import os
 from cryptography.fernet import Fernet
@@ -9,7 +8,7 @@ import base64
 
 class Vault(AbstractObject, metaclass=MutableSingleton):
 
-    key: bytes = HiddenBytes(Fernet.generate_key)
+    key: bytes = Bytes(Fernet.generate_key)
 
     @classmethod
     def from_password(cls, password: str,
@@ -44,8 +43,8 @@ class Vault(AbstractObject, metaclass=MutableSingleton):
 
 class Secret(String):
 
-    def from_string(self, value):
+    def from_string(self, value): # noqa
         return Vault().decrypt(value)
 
-    def to_string(self, value):
+    def to_string(self, value): # noqa
         return Vault().encrypt(value)

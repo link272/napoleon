@@ -15,8 +15,6 @@ class HashEncoder(BaseEncoder):
         return _hash.hexdigest()
 
     def _dispatch(self, _property, base, _hash): # noqa
-        if base is None or not exist(base) or not is_define(base):
-            pass
         if isinstance(_property, Instance):
             self._encode_instance(_property, base, _hash)
         elif isinstance(_property, (List, Set)):
@@ -37,7 +35,7 @@ class HashEncoder(BaseEncoder):
     def _encode_instance(self, _property, component, _hash):
         for k, prop in iter_properties(component.__class__):
             base = getattr(component, k, Nothing)
-            if exist(base):
+            if base:
                 self._dispatch(prop, base, _hash)
 
     def _encode_sequence(self, _property, base, _hash):

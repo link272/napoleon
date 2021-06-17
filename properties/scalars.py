@@ -23,7 +23,7 @@ class Boolean(Scalar):
         return False
 
     def from_string(self, value):
-        raise NotImplementedError
+        return bool(value)
 
 
 class Float(Scalar):
@@ -120,10 +120,10 @@ class String(Symbol):
         return cls(default=default, enum=[default])
 
     def to_string(self, value):
-        return value
+        return str(value)
 
     def from_string(self, value):
-        return value
+        return str(value)
 
 
 class Bytes(Symbol):

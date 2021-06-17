@@ -13,6 +13,7 @@ class CommandLine(AbstractObject, metaclass=Singleton):
 
     paths_config_file = FilePath(Path.cwd() / Path("config/paths.yml"), description="App related paths configuration file")
     environment = String("local")
+    vars = Map(String())
 
     @classmethod
     def from_cmd(cls, add_help=False):
