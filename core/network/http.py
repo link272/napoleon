@@ -25,21 +25,22 @@ class HTTPClient(Client):
     def to_auth(self):
         return (self.user, self.password) if self.user != "" and self.password != "" else None
 
+    def build_session(self):
+        self._session = requests.Session()
+        self._session.auth = self.to_auth()
+        self._session.verify = self.verify
+
     def __enter__(self):
         with self.lock:
             if not exist(self._session):
-                self._session = requests.Session()
-                self._session.auth = self.to_auth()
-                self._session.verify = self.verify
+                self.build_session()
             self._active_interfaces += 1
 
-    def refresh(self):
+    def refresh_session(self):
         with self.lock:
             self._session.close()
-            self.check_activity()
-            self._session = requests.Session()
-            self._session.auth = self.to_auth()
-            self._session.verify = self.verify
+            self.wait_for_activity()
+            self.build_session()
 
     def send(self, query, data=None, files=None, json=None):
         self.wait_for_activity()
@@ -58,11 +59,14 @@ class HTTPClient(Client):
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ReadTimeout,
                 requests.exceptions.ConnectTimeout,
-                requests.exceptions.HTTPError) as e:
-            self.refresh()
-            raise e
+                requests.exceptions.HTTPError) as error:
+            self.handle_error(response)
+            raise error
 
         return response.content
+
+    def handle_error(self, response):
+        self.refresh_session()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         with self.lock:
