@@ -3,6 +3,21 @@ from ..tools.collection import invert_map
 from .scalars import String
 
 
+class Lazy(object):
+
+    __slots__ = ("hash_map_ref", "hidden_name")
+
+    def __init__(self, hash_map_ref, name):
+        self.hash_map_ref = hash_map_ref
+        self.hidden_name = "_" + name
+
+    def __get__(self, instance, owner):
+        return self.hash_map_ref().get(getattr(instance, self.hidden_name), Nothing)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.hidden_name, value)
+
+
 class Alias(String):
 
     def __init__(self,

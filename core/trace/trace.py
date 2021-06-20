@@ -1,23 +1,12 @@
 from napoleon.properties import String, Integer, AbstractObject
 from napoleon.core.paths import Paths, FilePath, Path
+from napoleon.core.trace.base import Tracer
 
 import logging
 import logging.handlers
 
 
-class Logger(AbstractObject):
-
-    level: str = String("INFO", enum=["DEBUG", "INFO", "WARNING", "ERROR"])
-    formatting: str = String("%(asctime)s :: %(levelname)s :: %(message)s")
-    name: str = String("default")
-
-    def _clean_internal(self):
-        logger = logging.getLogger(self.name)
-        while logger.hasHandlers():
-            logger.removeHandler(logger.handlers[0])
-
-
-class FileLogger(Logger):
+class FileTracer(Tracer):
 
     max_size_in_bytes: int = Integer(2097152)
     nb_backup: int = Integer(2)
@@ -37,7 +26,7 @@ class FileLogger(Logger):
         logger.addHandler(file_handler)
 
 
-class StreamLogger(Logger):
+class StreamTracer(Tracer):
 
     def _build_internal(self):
         logger = logging.getLogger(self.name)

@@ -10,7 +10,7 @@ import socket
 urllib3.disable_warnings()
 
 
-class ServiceDownException(Exception):
+class ClientDownException(Exception):
 
     pass
 
@@ -63,10 +63,10 @@ class Client(AbstractObject):
             if not self.timer.is_active:
                 with temporary_state(self.timer, delay=self.service_timeout):
                     if not self.check_activity():
-                        raise ServiceDownException(f"Service: {self.name} is down since: {self.service_timeout} seconds")
+                        raise ClientDownException(f"Service: {self.name} is down since: {self.service_timeout} seconds")
             else:
                 if self._active_flag.wait(timeout=self.service_timeout):
-                    raise ServiceDownException(f"Service: {self.name} is down since: {self.service_timeout} seconds")
+                    raise ClientDownException(f"Service: {self.name} is down since: {self.service_timeout} seconds")
 
     def __str__(self):
         return self.name
