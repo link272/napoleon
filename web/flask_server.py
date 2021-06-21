@@ -1,14 +1,16 @@
 from flask import Flask, request
 import secrets
-from napoleon.properties import PlaceHolder, Alias, Boolean, String
-from napoleon.core.paths import Paths, Path, FilePath
+from napoleon.properties import PlaceHolder, Boolean, String
 from napoleon.core.network.http import HTTPQuery
 from napoleon.core.network.client import Client
-from napoleon.core.application import Application
+from napoleon.core.application import app
 from napoleon.core.daemon.server import ThreadedServer
 from napoleon.tools.singleton import exist
+from napoleon.core.special.path import FilePath
+from napoleon.core.special.alias import Alias
 
 import threading
+from pathlib import Path
 
 
 class FlaskServer(ThreadedServer):
@@ -16,12 +18,12 @@ class FlaskServer(ThreadedServer):
     secret_key = String(default=secrets.token_urlsafe)
     _shutdown_token = PlaceHolder(default=secrets.token_urlsafe)
     app = PlaceHolder()
-    server_client = Alias(Client, lambda: Application().clients)
+    server_client = Alias(Client)
     debug = Boolean(default=True)
-    key_filepath = FilePath(lambda: Paths().docs / Path("crt.pem"))
-    crt_filepath = FilePath(lambda: Paths().docs / Path("crt.pem"))
-    template_folder = FilePath(lambda: Paths().templates)
-    static_folder = FilePath(lambda: Paths().static)
+    key_filepath = FilePath(lambda: app.paths["docs"] / Path("crt.pem"))
+    crt_filepath = FilePath(lambda: app.paths["docs"] / Path("crt.pem"))
+    template_folder = FilePath(lambda: app.paths["templates"])
+    static_folder = FilePath(lambda: app.paths["static"])
 
     def _build_internal(self):
         self.app = self.build_app()

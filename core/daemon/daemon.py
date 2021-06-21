@@ -1,7 +1,7 @@
-from napoleon.properties import AbstractObject
+from napoleon.core.base import AbstractDaemon
 
 
-class Daemon(AbstractObject):
+class Daemon(AbstractDaemon):
 
     def start(self):
         raise NotImplementedError

@@ -1,15 +1,15 @@
-from napoleon.properties import MutableSingleton, Instance, Map, String, PlaceHolder
-from napoleon.core.trace import Logger
-from napoleon.core.network.client import Client
-from napoleon.core.storage.database import Database
-from napoleon.core.utils.machine import Platform
-from napoleon.core.cmd import CommandLine
+from napoleon.properties import MutableSingleton, Instance, Map, String, PlaceHolder, AbstractObject
+from napoleon.core.abstract import AbstractVault, AbstractPlateform, AbstractCommandLine, AbstractTracer, \
+    AbstractClient, AbstractDatabase, AbstractInterface, AbstractDaemon
+
 from napoleon.core.utils.config import Configurable
+from napoleon.core.utils.cmd import CommandLine
 from napoleon.core.special.path import FilePath
-from napoleon.core.vault import Vault
-from napoleon.core.daemon.base import Daemon
 from napoleon.decoders.json_decoder import JSONDecoder
-from jinja2 import Template
+from napoleon.tools.singleton import Undefined, is_define
+from napoleon.properties.base import iter_properties
+from napoleon.tools.io import load_yml, save_yml
+from napoleon.tools.collection import first
 
 import sys
 import importlib
@@ -17,21 +17,21 @@ import signal
 import warnings
 import time
 from pathlib import Path
-import yaml
 
 
 class Application(Configurable, metaclass=MutableSingleton):
 
+    cmd = Instance(AbstractCommandLine)
     name = String("Napoleon")
-    tracers = Map(Instance(Logger))
-    paths = Instance(FilePath())
-    clients = Map(Instance(Client))
-    databases = Map(Instance(Database))
-    platform = Instance(Platform, default=Platform.from_platform)
-    cmd = Instance(CommandLine)
-    vault = Instance(Vault)
     warning_filter: str = String("ignore")
-    daemons: dict = Map(Instance(Daemon))
+    paths = Map(FilePath())
+    vault = Instance(AbstractVault)
+    tracers = Map(Instance(AbstractTracer))
+    clients = Map(Instance(AbstractClient))
+    databases = Map(Instance(AbstractDatabase))
+    interfaces = Map(Instance(AbstractInterface))
+    daemons: dict = Map(Instance(AbstractDaemon))
+    platform = Instance(AbstractPlateform)
     _is_running = PlaceHolder()
 
     def __init__(self, **kwargs):
@@ -69,25 +69,36 @@ class Application(Configurable, metaclass=MutableSingleton):
 
     @classmethod
     def deserialize(cls, instance):
-        serialized_daemons = instance.pop("daemons", {})
-        app = JSONDecoder().decode(instance, cls)
-        for k, v in serialized_daemons.items():
-            app.daemons[k] = JSONDecoder().decode(v, Daemon)
-        return app
+        """ Order matter here """
+        _app = cls()
+        decoder = JSONDecoder()
+        for key, field in iter_properties(cls):
+            part = instance.get(key, Undefined)
+            if is_define(part):
+                _app.update({key: decoder(field, part)})
+        return _app
 
     @classmethod
-    def from_cmd(cls, cmd_class=CommandLine):
+    def configure(cls, cmd_class=CommandLine, context=Undefined):
         cmd = cmd_class.from_cmd(add_help=True)
 
-        context = {"cwd": str(Path.cwd())} # noqa
+        _context = context.copy() if is_define(context) else dict()
 
-        context["cmd"] = cmd.serialize()
+        _context["cwd"] = str(Path.cwd())
+        _context["root"] = str(Path(__file__.parent))
+        _context["cmd"] = cmd.serialize()
 
-        template = Template(cmd.paths_config_file.read_text())
-        config = template.render(context)
+        _app = cls.from_config(cmd.template_path, cmd.config_path, _context)
+        _app.cmd = cmd
+        _app.plateform = first(AbstractPlateform.__subclasses__()).from_platform()
+        return _app
 
-        context["paths"] = yaml.safe_load(config)
-        context["vault"] = Vault.from_base64_key(Path(context["paths"].get("vault").read_text()))
+    @classmethod
+    def load(cls, filepath):
+        return cls.deserialize(load_yml(filepath))
 
-        app = cls.from_config(cls.__name__.lower(), context)
-        return app
+    def dump(self, filepath):
+        save_yml(filepath, self.serialize())
+
+
+app = Application()

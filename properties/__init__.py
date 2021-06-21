@@ -1,4 +1,3 @@
-from .alias import Alias
 from .objects import AbstractObject
 from .scalars import Float, Integer, String, Boolean, Bytes, JSON, Symbol, UUID, DateTime
 from .base import PlaceHolder, iter_properties, recurse_iter_properties

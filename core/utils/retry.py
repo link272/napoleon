@@ -8,12 +8,13 @@ def retry(method):
     def wrapper(*args, **kwargs):
         result = None
         count = 0
-        while count <= args[0].retrier.max_retry:
-            if count < args[0].retrier.max_retry:
+        retrier = args[0].retrier
+        while count <= retrier.max_retry:
+            if count < retrier.max_retry:
                 try:
                     result = method(*args, **kwargs)
                 except Exception:  # noqa
-                    time.sleep(args[0].retrier.delay)
+                    time.sleep(retrier.delay)
                     count += 1
                 else:
                     break

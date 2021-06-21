@@ -10,8 +10,11 @@ DEFAULT = "DEFAULT"
 EXIT = "EXIT"
 
 
-class BaseAction(AbstractObject):
+class DynamicAction(AbstractObject):
 
+    config = JSON(default=dict)
+    executable: str = String()
+    force_reload = Boolean()
     name = String()
     is_enable = Boolean(default=True)
     allow_failure = Boolean()
@@ -30,18 +33,8 @@ class BaseAction(AbstractObject):
             self.log.info(f"Action: {self.name} is disable")
         return code
 
-    def execute(self, context):
-        raise NotImplementedError
-
     def __str__(self):
         return self.name
-
-
-class DynamicAction(BaseAction):
-
-    config = JSON(default=dict)
-    executable: str = String()
-    force_reload = Boolean()
 
     def execute(self, context):
         action = self.build_dynamic_action()

@@ -1,6 +1,6 @@
-from napoleon.properties import AbstractObject, String, Integer, Float, Instance, Singleton
-from napoleon.core.paths import Paths
-from napoleon.core.tasks.graph_machine import BaseAction
+from napoleon.properties import AbstractObject, String, Integer, Float, Instance
+from napoleon.core.abstract import AbstractPlateform
+from napoleon.core.application import app
 import platform as plt
 import subprocess
 import psutil
@@ -26,7 +26,7 @@ class RAM(AbstractObject):
         return psutil.virtual_memory().percent
 
 
-class Platform(AbstractObject, metaclass=Singleton):
+class Platform(AbstractPlateform):
 
     system = String()
     node = String()
@@ -48,17 +48,9 @@ class Platform(AbstractObject, metaclass=Singleton):
     def git_commit_id(self):
         sha1_ref = ""
         try:
-            res = subprocess.run(["git", "-C", str(Paths().root), "show-ref", "--head", "HEAD"], capture_output=True)
+            res = subprocess.run(["git", "-C", app.paths["root"], "show-ref", "--head", "HEAD"], capture_output=True)
             if res.returncode == 0:
                 sha1_ref = res.stdout.decode().split("\n")[0].split(" ")[0]
         except Exception as ex:
             self.log.error(f"Unable to get the git commit ID: {ex}")
         return sha1_ref
-
-
-class Monitoring(BaseAction):
-
-    logger_name = String(default="default")
-
-    def execute(self, context): # noqa
-        self.log.info(f"|cpu|{Platform().cpu.usage()}|ram|{Platform().ram.usage()}")

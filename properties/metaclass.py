@@ -1,24 +1,9 @@
 from .base import Property
-from .alias import Alias
+from .descriptor import Descriptor
 from ..tools.singleton import Nothing
 import threading
 
 lock = threading.RLock()
-
-
-class Lazy(object):
-
-    __slots__ = ("hash_map_ref", "hidden_name")
-
-    def __init__(self, hash_map_ref, name):
-        self.hash_map_ref = hash_map_ref
-        self.hidden_name = "_" + name
-
-    def __get__(self, instance, owner):
-        return self.hash_map_ref().get(getattr(instance, self.hidden_name), Nothing)
-
-    def __set__(self, instance, value):
-        setattr(instance, self.hidden_name, value)
 
 
 class SlottedType(type):
@@ -41,8 +26,8 @@ class SlottedType(type):
         _dict["__properties__"] = properties
 
         for _name in field_names:
-            if isinstance(properties[_name], Alias):
-                _dict[_name] = Lazy(properties[_name].hash_map_ref, _name)
+            if isinstance(properties[_name], Descriptor):
+                _dict[_name] = properties[_name].build_descriptor(_name)
                 _dict["__slots__"].remove(_name)
                 _dict["__slots__"].add("_" + _name)
             else:

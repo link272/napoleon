@@ -1,12 +1,57 @@
-from napoleon.properties import String, Alias
-from napoleon.core.storage.database import Database
+from napoleon.core.abstract import AbstractDatabase
 from napoleon.core.network.client import Client
-from napoleon.core.application import Application
+from napoleon.core.application import app
+from napoleon.core.special.path import FilePath
+from napoleon.core.special.alias import Alias
+from pathlib import Path
+from napoleon.properties import String, Boolean, PlaceHolder, AbstractObject, Float
+from pony.orm import Database as PonyDatabase
+
+
+class Database(AbstractDatabase):
+
+    name = String("artemis")
+    _engine = PlaceHolder()
+    _is_initialised = PlaceHolder()
+
+    def _build_internal(self):
+        self._engine = PonyDatabase()
+        self._is_initialised = False
+
+    def initialize(self):
+        if not self._is_initialised:
+            self.bind()
+            self._engine.generate_mapping(create_tables=True)
+            self._is_initialised = True
+
+    def bind(self):
+        raise NotImplementedError
+
+    @property
+    def entity(self):
+        return self._engine.Entity
+
+    @property
+    def db(self):
+        return self._engine
+
+
+class SqliteDatabase(Database):
+
+    filepath = FilePath(lambda: app.paths["data"] / Path("db.db3"))
+    create_db = Boolean(default=True)
+    timeout = Float(default=0.5)
+
+    def bind(self):
+        self._engine.bind("sqlite",
+                          filename=str(self.filepath),
+                          create_db=self.create_db,
+                          timeout=self.timeout)
 
 
 class PostgresDatabase(Database):
 
-    client: Client = Alias(Client, lambda: Application().clients)
+    client: Client = Alias(Client)
     database_name = String("artemis")
 
     def bind(self):
@@ -20,7 +65,7 @@ class PostgresDatabase(Database):
 
 class MysqlDatabase(Database):
 
-    client: Client = Alias(Client, lambda: Application().clients)
+    client: Client = Alias(Client)
     database_name = String("artemis")
 
     def bind(self):

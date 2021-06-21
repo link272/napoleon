@@ -2,7 +2,7 @@ import boto3
 
 import pendulum
 from napoleon.core.network.http import HTTPClient
-from napoleon.core.network.interface import Interface
+from napoleon.core.network.service import Service
 from napoleon.core.utils.encoders import Content
 from napoleon.properties import DateTime, Integer, String, AbstractObject, PlaceHolder
 
@@ -58,7 +58,7 @@ class S3Object(AbstractObject):
         return Content(S3Interface(client=self.client_name).stream(self.bucket, self.key).read())
 
 
-class S3Interface(Interface):
+class S3Interface(Service):
 
     def _check_internal(self):
         super()._check_internal()  # noqa

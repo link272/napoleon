@@ -1,7 +1,9 @@
+from napoleon.core.vault.secret import Secret
+from napoleon.core.special.alias import Alias
 from napoleon.properties import AbstractObject, String, Integer, Float, Instance, PlaceHolder
 from napoleon.core.utils.timer import Timer, timeout
-from napoleon.core.vault import Secret
 from napoleon.tools.context import temporary_state
+from napoleon.core.abstract import AbstractClient
 
 import threading
 import urllib3
@@ -15,13 +17,13 @@ class ClientDownException(Exception):
     pass
 
 
-class Client(AbstractObject):
+class Client(AbstractClient):
 
     name = String("default")
     host = String("127.0.0.1")
-    port = Integer(443)
     user = String()
     password = Secret()
+    port = Integer(443)
     timer: Timer = Instance(Timer, default=Timer)
     socket_timeout: int = Float(5.)
     service_timeout: int = Float(3600)
@@ -70,3 +72,9 @@ class Client(AbstractObject):
 
     def __str__(self):
         return self.name
+
+
+class Service(AbstractObject):
+
+    name = String()
+    client = Alias(Client)

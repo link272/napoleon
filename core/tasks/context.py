@@ -1,11 +1,11 @@
 from napoleon.properties import UUID, DateTime, Set, String, Instance, PlaceHolder, Boolean
-from napoleon.core.paths import Path, Paths
 from napoleon.core.utils.config import Configurable
 from napoleon.tools.regex import to_snake
 from napoleon.core.tasks.graph_machine import GraphMachine
+from napoleon.core.application import app
 import uuid
 import pendulum
-import threading
+from pathlib import Path
 
 
 class Context(Configurable):
@@ -17,8 +17,6 @@ class Context(Configurable):
     logger_name = String("default")
     engine: GraphMachine = Instance(GraphMachine)
     error_msg = String()
-    is_threaded = Boolean()
-    thread = PlaceHolder()
 
     def _build_internal(self):
         self.log.info(f"Context ID: {self.key}")
@@ -35,7 +33,7 @@ class Context(Configurable):
         raise NotImplementedError
 
     def build_context_directory(self, bucket=""):
-        parents = Paths().data / Path(str(self.key)) / Path(to_snake(bucket))
+        parents = app.paths["data"] / Path(str(self.key)) / Path(to_snake(bucket))
         if not parents.exists():
             parents.mkdir(parents=True, exist_ok=True)
         return parents
@@ -44,11 +42,4 @@ class Context(Configurable):
         return self.build_context_directory(bucket=bucket) / Path(to_snake(stem) + "." + ext)
 
     def run(self):
-        status = False
-        if self.is_threaded:
-            self.thread = threading.Thread(target=self.engine.execute, args=(self,))
-            self.thread.start()
-            status = self.thread.is_alive()
-        else:
-            self.engine.execute(self)
-        return status
+        return self.engine.execute(self)

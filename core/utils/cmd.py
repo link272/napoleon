@@ -1,17 +1,18 @@
-from napoleon.properties import AbstractObject, Singleton, String, Map, List, Set
+from napoleon.properties import String, Map, List, Set
 from napoleon.core.special.path import FilePath, Path
 from napoleon.properties.base import iter_properties
 from napoleon.properties.scalars import Scalar
 from napoleon.properties.container import Container
-
 from napoleon.tools.singleton import is_define
+from napoleon.core.abstract import AbstractCommandLine
 
 import argparse
 
 
-class CommandLine(AbstractObject, metaclass=Singleton):
+class CommandLine(AbstractCommandLine):
 
-    paths_config_file = FilePath(Path.cwd() / Path("config/paths.yml"), description="App related paths configuration file")
+    config_path = FilePath(Path.cwd() / Path("config/application.yml.j2"), description="App configuration file")
+    template_path = FilePath(Path.cwd() / Path("templates/application.yml.j2"), description="App configuration file")
     environment = String("local")
     vars = Map(String())
 

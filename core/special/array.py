@@ -24,5 +24,3 @@ class Array(Bytes):
 
     def from_bytes(self, value):
         return np.array(from_bson(value))
-
-

@@ -8,11 +8,12 @@ def timeout(method):
     @wraps(method)
     def wrapper(*args, **kwargs):
         flag = False
-        with args[0].timer:
-            while not args[0].timer.is_timed_out():
+        timer = args[0].timer
+        with timer:
+            while not timer.is_timed_out():
                 flag = method(*args, **kwargs)
                 if not flag:
-                    args[0].timer.wait()
+                    timer.wait()
                 else:
                     break
         return flag

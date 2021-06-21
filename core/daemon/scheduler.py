@@ -1,11 +1,12 @@
 from napoleon.properties import Boolean, String, Integer, PlaceHolder, Map, MutableSingleton, Instance, AbstractObject,\
     iter_properties
-from napoleon.core.tasks.graph_machine import BaseAction
+from napoleon.core.crons.base import CronAction
 from napoleon.core.daemon.base import Daemon
 from napoleon.tools.singleton import Nothing
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.base import STATE_PAUSED, STATE_RUNNING
+from napoleon.core.application import app
 
 
 CRON_REGEX = r"/(\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*/"
@@ -34,7 +35,7 @@ class Trigger(AbstractObject):
 class CronJob(AbstractObject):
 
     trigger = Instance(Trigger)
-    action: BaseAction = Instance(BaseAction)
+    action: CronAction = Instance(CronAction)
     coalesce = Boolean(default=True)
     misfire_grace_time = Integer(5)
     max_instances = Integer(1)
@@ -65,6 +66,7 @@ class Scheduler(Daemon, metaclass=MutableSingleton):
     def _build_internal(self):
         for name, cron in filter(lambda t: t[1].is_enable, self.cron_jobs.items()):
             self.backend.add_job(cron.execute,
+                                 args=(app,),
                                  trigger=cron.trigger.to_aps(),
                                  id=cron.action.name,
                                  name=cron.action.name,
