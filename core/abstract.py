@@ -6,12 +6,17 @@ class AbstractVault(AbstractObject):
     pass
 
 
-class AbstractPlateform(AbstractObject):
+class AbstractPlatform(AbstractObject):
 
     pass
 
 
 class AbstractCommandLine(AbstractObject):
+
+    pass
+
+
+class AbstractSharedInterface(AbstractObject):
 
     pass
 
@@ -32,11 +37,6 @@ class AbstractClient(AbstractNamedObject):
 
 
 class AbstractDatabase(AbstractNamedObject):
-
-    pass
-
-
-class AbstractInterface(AbstractNamedObject):
 
     pass
 

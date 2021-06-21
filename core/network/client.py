@@ -19,7 +19,6 @@ class ClientDownException(Exception):
 
 class Client(AbstractClient):
 
-    name = String("default")
     host = String("127.0.0.1")
     user = String()
     password = Secret()
@@ -74,7 +73,6 @@ class Client(AbstractClient):
         return self.name
 
 
-class Service(AbstractObject):
+class Interface(AbstractObject):
 
-    name = String()
     client = Alias(Client)

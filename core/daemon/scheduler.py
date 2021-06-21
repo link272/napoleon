@@ -1,7 +1,7 @@
 from napoleon.properties import Boolean, String, Integer, PlaceHolder, Map, MutableSingleton, Instance, AbstractObject,\
     iter_properties
-from napoleon.core.crons.base import CronAction
-from napoleon.core.daemon.base import Daemon
+from napoleon.core.cron.action import CronAction
+from napoleon.core.daemon.daemon import Daemon
 from napoleon.tools.singleton import Nothing
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -42,11 +42,11 @@ class CronJob(AbstractObject):
     is_enable = Boolean(default=True)
     message = String()
 
-    def execute(self):
+    def execute(self, app):
         try:
             if self.message:
                 self.log.info(self.message)
-            self.action.execute(Nothing)
+            self.action.execute(app)
         except Exception as ex:
             self.log.error(ex)
 
@@ -68,8 +68,8 @@ class Scheduler(Daemon, metaclass=MutableSingleton):
             self.backend.add_job(cron.execute,
                                  args=(app,),
                                  trigger=cron.trigger.to_aps(),
-                                 id=cron.action.name,
-                                 name=cron.action.name,
+                                 id=name,
+                                 name=name,
                                  misfire_grace_time=cron.misfire_grace_time or None,
                                  coalesce=cron.coalesce,
                                  max_instances=cron.max_instances,

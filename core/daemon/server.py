@@ -1,5 +1,5 @@
 from napoleon.properties import PlaceHolder, Boolean, Float
-from napoleon.core.daemon.base import Daemon
+from napoleon.core.daemon.daemon import Daemon
 from napoleon.tools.singleton import Nothing, exist
 import time
 

@@ -1,8 +1,8 @@
 from ..tools.singleton import Nothing
-from .scalars import String
+from .base import Property
 
 
-class Descriptor(String):
+class Descriptor(Property):
 
     def __str__(self):
         return "@" + self.__class__.__name__.lower()

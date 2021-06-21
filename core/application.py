@@ -1,6 +1,6 @@
 from napoleon.properties import MutableSingleton, Instance, Map, String, PlaceHolder, AbstractObject
-from napoleon.core.abstract import AbstractVault, AbstractPlateform, AbstractCommandLine, AbstractTracer, \
-    AbstractClient, AbstractDatabase, AbstractInterface, AbstractDaemon
+from napoleon.core.abstract import AbstractVault, AbstractPlatform, AbstractCommandLine, AbstractTracer, \
+    AbstractClient, AbstractDatabase, AbstractSharedInterface, AbstractDaemon
 
 from napoleon.core.utils.config import Configurable
 from napoleon.core.utils.cmd import CommandLine
@@ -29,9 +29,9 @@ class Application(Configurable, metaclass=MutableSingleton):
     tracers = Map(Instance(AbstractTracer))
     clients = Map(Instance(AbstractClient))
     databases = Map(Instance(AbstractDatabase))
-    interfaces = Map(Instance(AbstractInterface))
+    interfaces = Map(Instance(AbstractSharedInterface))
     daemons: dict = Map(Instance(AbstractDaemon))
-    platform = Instance(AbstractPlateform)
+    platform = Instance(AbstractPlatform)
     _is_running = PlaceHolder()
 
     def __init__(self, **kwargs):
@@ -75,7 +75,7 @@ class Application(Configurable, metaclass=MutableSingleton):
         for key, field in iter_properties(cls):
             part = instance.get(key, Undefined)
             if is_define(part):
-                _app.update({key: decoder(field, part)})
+                _app.update(**{key: decoder._dispatch(field, part)})
         return _app
 
     @classmethod
@@ -85,12 +85,12 @@ class Application(Configurable, metaclass=MutableSingleton):
         _context = context.copy() if is_define(context) else dict()
 
         _context["cwd"] = str(Path.cwd())
-        _context["root"] = str(Path(__file__.parent))
+        _context["root"] = str(Path(__file__).parent)
         _context["cmd"] = cmd.serialize()
 
         _app = cls.from_config(cmd.template_path, cmd.config_path, _context)
         _app.cmd = cmd
-        _app.plateform = first(AbstractPlateform.__subclasses__()).from_platform()
+        _app.platform = first(AbstractPlatform.__subclasses__()).from_platform()
         return _app
 
     @classmethod

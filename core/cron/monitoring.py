@@ -1,4 +1,4 @@
-from napoleon.core.crons.base import CronAction
+from napoleon.core.cron.action import CronAction
 from napoleon.properties import String, Instance, List
 
 

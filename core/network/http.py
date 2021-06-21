@@ -1,6 +1,5 @@
 from napoleon.core.utils.encoders import Transformer
-from napoleon.core.network.interface import Interface
-from napoleon.core.network.client import Client
+from napoleon.core.network.client import Client, Interface
 from napoleon.properties import String, Instance, Map, List, AbstractObject, Float, Boolean, PlaceHolder
 from napoleon.core.utils.retry import Retrier, retry
 from napoleon.tools.singleton import exist, Nothing

@@ -11,8 +11,8 @@ import argparse
 
 class CommandLine(AbstractCommandLine):
 
-    config_path = FilePath(Path.cwd() / Path("config/application.yml.j2"), description="App configuration file")
-    template_path = FilePath(Path.cwd() / Path("templates/application.yml.j2"), description="App configuration file")
+    config_path = FilePath(Path.cwd() / Path("config/application.yml"), description="env-related config file")
+    template_path = FilePath(Path.cwd() / Path("templates/application.yml"), description="generic config file")
     environment = String("local")
     vars = Map(String())
 

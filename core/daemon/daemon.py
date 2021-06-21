@@ -1,4 +1,4 @@
-from napoleon.core.base import AbstractDaemon
+from napoleon.core.abstract import AbstractDaemon
 
 
 class Daemon(AbstractDaemon):

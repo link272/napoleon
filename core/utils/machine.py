@@ -1,5 +1,5 @@
 from napoleon.properties import AbstractObject, String, Integer, Float, Instance
-from napoleon.core.abstract import AbstractPlateform
+from napoleon.core.abstract import AbstractPlatform
 from napoleon.core.application import app
 import platform as plt
 import subprocess
@@ -26,7 +26,7 @@ class RAM(AbstractObject):
         return psutil.virtual_memory().percent
 
 
-class Platform(AbstractPlateform):
+class Platform(AbstractPlatform):
 
     system = String()
     node = String()

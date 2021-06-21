@@ -1,6 +1,7 @@
 from napoleon.tools.singleton import Intrinsic, Undefined, Nothing
 from napoleon.tools.collection import invert_map
 from napoleon.properties.descriptor import Descriptor
+from napoleon.properties import String, Set, Instance
 from napoleon.core.application import app
 
 
@@ -20,7 +21,7 @@ class Lazy(object):
         setattr(instance, self.hidden_name, value)
 
 
-class Alias(Descriptor):
+class Alias(String, Descriptor):
 
     __slots__ = ("item_type",)
 
@@ -45,13 +46,58 @@ class Alias(Descriptor):
         return super().__lt__(other) and self.item_type.issubclass(other.item_type)
 
     def __str__(self):
-        return "@" + str(self.item_type)
+        return "@" + str(self.item_type.__name__)
 
     def system_default(self):
         return Nothing
 
     def to_string(self, value):
         return invert_map(getattr(app, self.item_type.__name__.lower() + "s"))[value]
+
+    def from_string(self, value):
+        return value
+
+
+class LazySet(object):
+
+    __slots__ = ("hidden_name", "map_attr_name")
+
+    def __init__(self, name, map_attr_name):
+        self.hidden_name = "_" + name
+        self.map_attr_name = map_attr_name
+
+    def __get__(self, instance, owner):
+        _map = getattr(app, self.map_attr_name)
+        return {key: _map.get(key) for key in getattr(instance, self.hidden_name)}
+
+    def __set__(self, instance, value):
+        setattr(instance, self.hidden_name, value)
+
+
+class MapAlias(Set, Descriptor):
+
+    __slots__ = ("item_class",)
+
+    def __init__(self,
+                 item_class,
+                 *,
+                 default=Intrinsic,
+                 description=Undefined,
+                 nullable=False):
+        super().__init__(String(),
+                         default=default,
+                         description=description,
+                         nullable=nullable)
+        self.item_class = item_class
+
+    def build_descriptor(self, name):
+        return LazySet(name, self.item_class.__name__.lower() + "s")
+
+    def __str__(self):
+        return "@" + str(self.item_class.__name__)
+
+    def to_string(self, values):
+        return [invert_map(getattr(app, self.item_class.__name__.lower() + "s")) for v in values]
 
     def from_string(self, value):
         return value
