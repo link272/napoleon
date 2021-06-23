@@ -1,8 +1,7 @@
 from napoleon.properties import Boolean, String, Integer, PlaceHolder, Map, MutableSingleton, Instance, AbstractObject,\
     iter_properties
 from napoleon.core.cron.action import CronAction
-from napoleon.core.daemon.daemon import Daemon
-from napoleon.tools.singleton import Nothing
+from napoleon.core.abstract import AbstractDaemon
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.base import STATE_PAUSED, STATE_RUNNING
@@ -51,7 +50,7 @@ class CronJob(AbstractObject):
             self.log.error(ex)
 
 
-class Scheduler(Daemon, metaclass=MutableSingleton):
+class Scheduler(AbstractDaemon, metaclass=MutableSingleton):
 
     cron_jobs: dict = Map(Instance(CronJob))
     is_enable = Boolean(default=True)
