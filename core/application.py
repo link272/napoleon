@@ -5,6 +5,7 @@ from napoleon.core.abstract import AbstractVault, AbstractPlatform, AbstractComm
 from napoleon.core.utils.config import Configurable
 from napoleon.core.utils.cmd import CommandLine
 from napoleon.core.special.path import FilePath
+from napoleon.core.vault.open import OpenVault
 from napoleon.decoders.json_decoder import JSONDecoder
 from napoleon.tools.singleton import Undefined, is_define
 from napoleon.properties.base import iter_properties
@@ -25,7 +26,7 @@ class Application(Configurable, metaclass=MutableSingleton):
     name = String("Napoleon")
     warning_filter: str = String("ignore")
     paths = Map(FilePath())
-    vault = Instance(AbstractVault)
+    vault = Instance(AbstractVault, default=OpenVault())
     tracers = Map(Instance(AbstractTracer))
     clients = Map(Instance(AbstractClient))
     databases = Map(Instance(AbstractDatabase))
@@ -75,7 +76,7 @@ class Application(Configurable, metaclass=MutableSingleton):
         for key, field in iter_properties(cls):
             part = instance.get(key, Undefined)
             if is_define(part):
-                _app.update(**{key: decoder._dispatch(field, part)})
+                _app.update(**{key: decoder._dispatch(field, part)}) # noqa
         return _app
 
     @classmethod
@@ -99,6 +100,3 @@ class Application(Configurable, metaclass=MutableSingleton):
 
     def dump(self, filepath):
         save_yml(filepath, self.serialize())
-
-
-app = Application()

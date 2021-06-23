@@ -1,6 +1,6 @@
 from napoleon.properties import String, AbstractObject, Boolean, Integer, PlaceHolder, Map, JSON
 from napoleon.core.special.path import FilePath, Path
-from napoleon.core.vault.secret import Secret
+from napoleon.core.special.secret import Secret
 from napoleon.tools.singleton import Nothing
 
 import base64

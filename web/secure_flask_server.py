@@ -28,7 +28,7 @@ class SecureFlaskServer(PersistentFlaskServer):
 
         if not hasattr(self.database.db, "User"):
 
-            class User(self.database.entity, UserMixin):
+            class User(self.database.entity, UserMixin):  # noqa
                 login = Required(str, unique=True)
                 hashed_password = Required(bytes)
                 salt = Required(bytes)

@@ -8,7 +8,7 @@ def timeout(method):
     @wraps(method)
     def wrapper(*args, **kwargs):
         flag = False
-        timer = args[0].timer
+        timer = args[0].timer.copy()
         with timer:
             while not timer.is_timed_out():
                 flag = method(*args, **kwargs)

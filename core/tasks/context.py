@@ -2,7 +2,7 @@ from napoleon.properties import UUID, DateTime, Set, String, Instance, PlaceHold
 from napoleon.core.utils.config import Configurable
 from napoleon.tools.regex import to_snake
 from napoleon.core.tasks.graph_machine import GraphMachine
-from napoleon.core.application import app
+from napoleon.core.application import Application
 import uuid
 import pendulum
 from pathlib import Path
@@ -33,7 +33,7 @@ class Context(Configurable):
         raise NotImplementedError
 
     def build_context_directory(self, bucket=""):
-        parents = app.paths["data"] / Path(str(self.key)) / Path(to_snake(bucket))
+        parents = Application().paths["data"] / Path(str(self.key)) / Path(to_snake(bucket))
         if not parents.exists():
             parents.mkdir(parents=True, exist_ok=True)
         return parents

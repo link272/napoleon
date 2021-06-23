@@ -3,7 +3,7 @@ import secrets
 from napoleon.properties import PlaceHolder, Boolean, String
 from napoleon.core.network.http import HTTPQuery
 from napoleon.core.network.client import Client
-from napoleon.core.application import app
+from napoleon.core.application import Application
 from napoleon.core.daemon.server import ThreadedServer
 from napoleon.tools.singleton import exist
 from napoleon.core.special.path import FilePath
@@ -20,10 +20,10 @@ class FlaskServer(ThreadedServer):
     app = PlaceHolder()
     server_client = Alias(Client)
     debug = Boolean(default=True)
-    key_filepath = FilePath(lambda: app.paths["docs"] / Path("crt.pem"))
-    crt_filepath = FilePath(lambda: app.paths["docs"] / Path("crt.pem"))
-    template_folder = FilePath(lambda: app.paths["templates"])
-    static_folder = FilePath(lambda: app.paths["static"])
+    key_filepath = FilePath(lambda: Application().paths["docs"] / Path("crt.pem"))
+    crt_filepath = FilePath(lambda: Application().paths["docs"] / Path("crt.pem"))
+    template_folder = FilePath(lambda: Application().paths["templates"])
+    static_folder = FilePath(lambda: Application().paths["static"])
 
     def _build_internal(self):
         self.app = self.build_app()

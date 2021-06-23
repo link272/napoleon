@@ -2,7 +2,7 @@ from napoleon.tools.singleton import Intrinsic, Undefined, Nothing
 from napoleon.tools.collection import invert_map
 from napoleon.properties.descriptor import Descriptor
 from napoleon.properties import String, Set, Instance
-from napoleon.core.application import app
+from napoleon.core.application import Application
 
 
 class Lazy(object):
@@ -14,7 +14,7 @@ class Lazy(object):
         self.map_attr_name = map_attr_name
 
     def __get__(self, instance, owner):
-        _map = getattr(app, self.map_attr_name)
+        _map = getattr(Application(), self.map_attr_name)
         return _map.get(getattr(instance, self.hidden_name), Nothing)
 
     def __set__(self, instance, value):
@@ -52,7 +52,7 @@ class Alias(String, Descriptor):
         return Nothing
 
     def to_string(self, value):
-        return invert_map(getattr(app, self.item_type.__name__.lower() + "s"))[value]
+        return invert_map(getattr(Application(), self.item_type.__name__.lower() + "s"))[value]
 
     def from_string(self, value):
         return value
@@ -67,7 +67,7 @@ class LazySet(object):
         self.map_attr_name = map_attr_name
 
     def __get__(self, instance, owner):
-        _map = getattr(app, self.map_attr_name)
+        _map = getattr(Application(), self.map_attr_name)
         return {key: _map.get(key) for key in getattr(instance, self.hidden_name)}
 
     def __set__(self, instance, value):
@@ -97,7 +97,8 @@ class MapAlias(Set, Descriptor):
         return "@" + str(self.item_class.__name__)
 
     def to_string(self, values):
-        return [invert_map(getattr(app, self.item_class.__name__.lower() + "s")) for v in values]
+        _invert = invert_map(getattr(Application(), self.item_class.__name__.lower() + "s"))
+        return [_invert[v] for v in values]
 
     def from_string(self, value):
         return value

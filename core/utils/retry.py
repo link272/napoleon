@@ -8,13 +8,13 @@ def retry(method):
     def wrapper(*args, **kwargs):
         result = None
         count = 0
-        retrier = args[0].retrier
+        retrier = args[0].retrier.copy()
         while count <= retrier.max_retry:
             if count < retrier.max_retry:
                 try:
                     result = method(*args, **kwargs)
                 except Exception:  # noqa
-                    time.sleep(retrier.delay)
+                    retrier.wait(count)
                     count += 1
                 else:
                     break
@@ -28,3 +28,6 @@ class Retrier(AbstractObject):
 
     max_retry = Integer(3)
     delay = Integer(3)
+
+    def wait(self, count):
+        time.sleep(self.delay)

@@ -1,6 +1,6 @@
 from napoleon.core.abstract import AbstractDatabase
 from napoleon.core.network.client import Client
-from napoleon.core.application import app
+from napoleon.core.application import Application
 from napoleon.core.special.path import FilePath
 from napoleon.core.special.alias import Alias
 from pathlib import Path
@@ -10,7 +10,6 @@ from pony.orm import Database as PonyDatabase
 
 class Database(AbstractDatabase):
 
-    name = String("artemis")
     _engine = PlaceHolder()
     _is_initialised = PlaceHolder()
 
@@ -38,7 +37,7 @@ class Database(AbstractDatabase):
 
 class SqliteDatabase(Database):
 
-    filepath = FilePath(lambda: app.paths["data"] / Path("db.db3"))
+    filepath = FilePath(lambda: Application().paths["data"] / Path("db.db3"))
     create_db = Boolean(default=True)
     timeout = Float(default=0.5)
 

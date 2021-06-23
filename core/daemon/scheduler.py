@@ -6,7 +6,7 @@ from napoleon.tools.singleton import Nothing
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.base import STATE_PAUSED, STATE_RUNNING
-from napoleon.core.application import app
+from napoleon.core.application import Application
 
 
 CRON_REGEX = r"/(\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*/"
@@ -66,7 +66,7 @@ class Scheduler(Daemon, metaclass=MutableSingleton):
     def _build_internal(self):
         for name, cron in filter(lambda t: t[1].is_enable, self.cron_jobs.items()):
             self.backend.add_job(cron.execute,
-                                 args=(app,),
+                                 args=(Application(),),
                                  trigger=cron.trigger.to_aps(),
                                  id=name,
                                  name=name,

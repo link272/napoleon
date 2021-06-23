@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 import base64
 
 
-class Vault(AbstractVault):
+class FernetVault(AbstractVault):
 
     key_filepath: Path = FilePath()
     _cipher = PlaceHolder()
