@@ -24,17 +24,17 @@ class AbstractCommandLine(AbstractObject):
         raise NotImplementedError
 
 
+class AbstractSharedInterface(AbstractObject):
+
+    pass
+
+
 class AbstractNamedObject(AbstractObject):
 
     name = String()
 
     def __str__(self):
         return self.name
-
-
-class AbstractSharedInterface(AbstractNamedObject):
-
-    pass
 
 
 class AbstractTracer(AbstractNamedObject):
