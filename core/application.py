@@ -18,6 +18,7 @@ import signal
 import warnings
 import time
 from pathlib import Path
+import os
 
 
 class Application(Configurable, metaclass=MutableSingleton):
@@ -88,6 +89,7 @@ class Application(Configurable, metaclass=MutableSingleton):
         _context["cwd"] = str(Path.cwd())
         _context["root"] = str(Path(__file__).parent)
         _context["cmd"] = cmd.serialize()
+        _context["env"] = dict(os.environ)
 
         _app = cls.from_config(cmd.template_path, cmd.config_path, _context)
         _app.cmd = cmd
