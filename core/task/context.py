@@ -33,7 +33,7 @@ class Context(Configurable):
         raise NotImplementedError
 
     def build_context_directory(self, bucket=""):
-        parents = Application().paths["data"] / Path(str(self.key)) / Path(to_snake(bucket))
+        parents = Application().paths.data / Path(str(self.key)) / Path(to_snake(bucket))
         if not parents.exists():
             parents.mkdir(parents=True, exist_ok=True)
         return parents

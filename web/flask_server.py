@@ -20,8 +20,8 @@ class FlaskServer(ThreadedServer):
     app = PlaceHolder()
     server_client = Alias(Client)
     debug = Boolean(default=True)
-    key_filepath = FilePath(lambda: Application().paths["docs"] / Path("crt.pem"))
-    crt_filepath = FilePath(lambda: Application().paths["docs"] / Path("crt.pem"))
+    key_filepath = FilePath(lambda: Application().paths.docs / Path("crt.pem"))
+    crt_filepath = FilePath(lambda: Application().paths.docs / Path("crt.pem"))
     template_folder = FilePath(lambda: Application().paths["templates"])
     static_folder = FilePath(lambda: Application().paths["static"])
 

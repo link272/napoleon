@@ -37,7 +37,7 @@ class Database(AbstractDatabase):
 
 class SqliteDatabase(Database):
 
-    filepath = FilePath(lambda: Application().paths["data"] / Path("db.db3"))
+    filepath = FilePath(lambda: Application().paths.data / Path("db.db3"))
     create_db = Boolean(default=True)
     timeout = Float(default=0.5)
 

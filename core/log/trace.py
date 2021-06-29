@@ -25,7 +25,7 @@ class FileTracer(Tracer):
     max_size_in_bytes: int = Integer(2097152)
     nb_backup: int = Integer(2)
     file_mode: str = String("w", enum=["w", "a"])
-    filepath: Path = FilePath(lambda: Application().paths["log"] / Path("artemis.log"))
+    filepath: Path = FilePath(lambda: Application().paths.log / Path("artemis.log"))
 
     def _build_internal(self):
         logger = logging.getLogger(self.name)

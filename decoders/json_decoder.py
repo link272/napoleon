@@ -47,4 +47,4 @@ class JSONDecoder(BaseDecoder):
         return {self._dispatch(_property.item_type, v) for v in base}
 
     def _decode_mapping(self, _property, base):
-        return {k: self._dispatch(_property.item_type, v) for k, v in base.items()}
+        return _property._type((k, self._dispatch(_property.item_type, v)) for k, v in base.items())

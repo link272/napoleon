@@ -52,4 +52,4 @@ class GraphQLDecoder(BaseDecoder):
     def _decode_mapping(self, _property, base):
         name = str(_property.item_type) + "Map"
         _type, _prop = self.model.map_classes[name]
-        return {item.key: self._dispatch(_prop, item.value) for item in base}
+        return _property._type((item.key, self._dispatch(_prop, item.value)) for item in base)

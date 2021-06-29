@@ -5,6 +5,7 @@ from napoleon.core.abstract import AbstractVault, AbstractPlatform, AbstractComm
 from napoleon.core.utils.config import Configurable
 from napoleon.core.utils.cmd import CommandLine
 from napoleon.core.special.path import FilePath
+from napoleon.core.special.bunch import Bunch
 from napoleon.core.vault.open import OpenVault
 from napoleon.decoders.json_decoder import JSONDecoder
 from napoleon.tools.singleton import Undefined, is_define
@@ -26,7 +27,7 @@ class Application(Configurable, metaclass=MutableSingleton):
     cmd = Instance(AbstractCommandLine)
     name = String("Napoleon")
     warning_filter: str = String("ignore")
-    paths = Map(FilePath())
+    paths = Bunch(FilePath())
     vault = Instance(AbstractVault, default=OpenVault())
     tracers = Map(Instance(AbstractTracer))
     clients = Map(Instance(AbstractClient))
@@ -87,7 +88,7 @@ class Application(Configurable, metaclass=MutableSingleton):
         _context = context.copy() if is_define(context) else dict()
 
         _context["cwd"] = str(Path.cwd())
-        _context["root"] = str(Path(__file__).parent)
+        _context.root = str(Path(__file__).parent)
         _context["cmd"] = cmd.serialize()
         _context["env"] = dict(os.environ)
 

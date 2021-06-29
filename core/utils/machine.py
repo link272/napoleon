@@ -48,7 +48,7 @@ class Platform(AbstractPlatform):
     def git_commit_id(self):
         sha1_ref = ""
         try:
-            res = subprocess.run(["git", "-C", Application().paths["root"], "show-ref", "--head", "HEAD"], capture_output=True)
+            res = subprocess.run(["git", "-C", Application().paths.root, "show-ref", "--head", "HEAD"], capture_output=True)
             if res.returncode == 0:
                 sha1_ref = res.stdout.decode().split("\n")[0].split(" ")[0]
         except Exception as ex:

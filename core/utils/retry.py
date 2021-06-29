@@ -1,4 +1,4 @@
-from napoleon.properties import AbstractObject, Integer
+from napoleon.properties import AbstractObject, Integer, Float
 from functools import wraps
 import time
 
@@ -27,7 +27,7 @@ def retry(method):
 class Retrier(AbstractObject):
 
     max_retry = Integer(3)
-    delay = Integer(3)
+    delay: float = Float(3.)
 
     def wait(self, count):
         time.sleep(self.delay)

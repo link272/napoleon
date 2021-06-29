@@ -25,7 +25,7 @@ class Transformer(AbstractObject):
 
 class JsonEncoder(Transformer):
 
-    sort_keys = Boolean()
+    sort_keys: bool = Boolean()
 
     def transform(self, data):  # struct -> string
         return json.dumps(data, sort_keys=self.sort_keys)
