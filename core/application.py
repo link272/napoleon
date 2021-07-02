@@ -67,6 +67,9 @@ class Application(Configurable, metaclass=MutableSingleton):
                 time.sleep(2)
             except KeyboardInterrupt:
                 self._is_running = False
+        self.shutdown()
+
+    def shutdown(self):
         for daemon in self.daemons.values():
             daemon.shutdown()
 
@@ -88,7 +91,7 @@ class Application(Configurable, metaclass=MutableSingleton):
         _context = context.copy() if is_define(context) else dict()
 
         _context["cwd"] = str(Path.cwd())
-        _context.root = str(Path(__file__).parent)
+        _context["root"] = str(Path(__file__).parent)
         _context["cmd"] = cmd.serialize()
         _context["env"] = dict(os.environ)
 

@@ -1,5 +1,5 @@
 from munch import Munch
-from napoleon.tools.singleton import Map
+from napoleon.properties.container import Map
 
 
 class Bunch(Map):

@@ -3,7 +3,6 @@ from napoleon.generators.json_schema import JSONSchema
 import yaml
 from jinja2 import Template
 from jsonmerge import Merger
-from pathlib import Path
 
 
 class Configurable(AbstractObject):

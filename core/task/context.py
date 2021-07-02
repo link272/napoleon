@@ -1,7 +1,7 @@
 from napoleon.properties import UUID, DateTime, Set, String, Instance, PlaceHolder, Boolean
 from napoleon.core.utils.config import Configurable
 from napoleon.tools.regex import to_snake
-from napoleon.core.tasks.graph_machine import GraphMachine
+from napoleon.core.task.graph_machine import GraphMachine
 from napoleon.core.application import Application
 import uuid
 import pendulum

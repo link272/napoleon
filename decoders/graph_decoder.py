@@ -16,10 +16,8 @@ class GraphQLDecoder(BaseDecoder):
             head = _property.system_default()
         elif isinstance(_property, Instance):
             head = self._decode_instance(_property, base)
-        elif isinstance(_property, Set):
-            head = self._decode_set(_property, base)
         elif isinstance(_property, List):
-            head = self._decode_list(_property, base)
+            head = self._decode_sequence(_property, base)
         elif isinstance(_property, Map):
             head = self._decode_mapping(_property, base)
         elif isinstance(_property, (Float, Integer, Boolean, JSON, DateTime, UUID)):
@@ -43,11 +41,8 @@ class GraphQLDecoder(BaseDecoder):
         cls = _property.infer_class(instance)
         return cls(**instance)
 
-    def _decode_list(self, _property, base):
-        return [self._dispatch(_property.item_type, v) for v in base]
-
-    def _decode_set(self, _property, base):
-        return {self._dispatch(_property.item_type, v) for v in base}
+    def _decode_sequence(self, _property, base):
+        return _property._type(self._dispatch(_property.item_type, v) for v in base)
 
     def _decode_mapping(self, _property, base):
         name = str(_property.item_type) + "Map"

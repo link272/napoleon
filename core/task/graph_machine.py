@@ -48,7 +48,7 @@ class DynamicAction(AbstractObject):
         if self.force_reload:
             importlib.reload(module)
         action_class = getattr(module, action_class_name)
-        return action_class.from_json(self.config)
+        return action_class.deserialize(self.config)
 
 
 class LinkAction(AbstractObject):
@@ -95,7 +95,7 @@ class GraphMachine(Configurable):
             try:
                 code = node.run(context)
             except Exception as e:
-                self.log.error(f"An exception occurs: {e}, action: {node.name}, allow_failure: {node.allow_failure}")
+                self.log.exception(f"An exception occurs: {e}, action: {node.name}, allow_failure: {node.allow_failure}")
                 if not node.allow_failure:
                     code = EXIT
                     context.resume_action = node.name
