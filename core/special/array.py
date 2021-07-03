@@ -1,11 +1,11 @@
-from napoleon.properties import Bytes
+from napoleon.properties import Blob
 import numpy as np
 from napoleon.tools.bson import to_bson, from_bson
 from napoleon.tools.singleton import Nothing
 import json
 
 
-class Array(Bytes):
+class Array(Blob):
 
     __slots__ = ()
     _type = np.array
@@ -24,3 +24,4 @@ class Array(Bytes):
 
     def from_bytes(self, value):
         return np.array(from_bson(value))
+

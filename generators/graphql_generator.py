@@ -1,6 +1,6 @@
 from ..properties.container import List, Set, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, String, DateTime, JSON, UUID, Bytes, Boolean, Symbol
+from ..properties.scalars import Float, Integer, String, DateTime, JSON, UUID, Bytes, Boolean, Blob
 from ..properties.metaclass import SlottedType
 from ..properties.base import PlaceHolder, recurse_iter_properties
 from ..tools.singleton import Nothing, Undefined, exist, is_define
@@ -67,7 +67,7 @@ class GraphQLModel(object):
             _type = graphene.JSONString
         elif isinstance(_property, UUID):
             _type = graphene.UUID
-        elif isinstance(_property, Symbol):
+        elif isinstance(_property, Blob):
             _type = graphene.String
         elif isinstance(_property, PlaceHolder):
             _type = Nothing

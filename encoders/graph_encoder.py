@@ -1,4 +1,4 @@
-from ..properties import List, Set, Map, Instance, Float, Integer, DateTime, JSON, UUID, Boolean, Symbol,\
+from ..properties import List, Set, Map, Instance, Float, Integer, DateTime, JSON, UUID, Boolean, Blob,\
     iter_properties, PlaceHolder
 from ..tools.singleton import Nothing, exist
 from .base import BaseEncoder
@@ -17,8 +17,8 @@ class GraphQLEncoder(BaseEncoder):
         elif isinstance(_property, Map):
             head = self._encode_mapping(_property, base)
         elif isinstance(_property, (Float, Integer, Boolean, JSON, DateTime, UUID)):
-            head = base
-        elif isinstance(_property, Symbol):
+            head = _property.to_primitive(base)
+        elif isinstance(_property, Blob):
             head = _property.to_string(base)
         elif isinstance(_property, PlaceHolder):
             head = Nothing

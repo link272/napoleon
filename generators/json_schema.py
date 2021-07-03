@@ -1,6 +1,6 @@
 from ..properties.container import List, Set, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, String, JSON, Boolean, Symbol
+from ..properties.scalars import Float, Integer, String, JSON, Boolean, Blob, Symbol
 from ..properties.base import PlaceHolder, recurse_iter_properties
 from ..tools.singleton import is_define
 from jsonschema import validate
@@ -36,6 +36,8 @@ class JSONSchema(object):
             schema = self._build_base_schema("object", _property)
         elif isinstance(_property, PlaceHolder):
             schema = self._build_base_schema("null", _property)
+        elif isinstance(_property, Blob):
+            schema = self._build_base_schema("string", _property)
         elif isinstance(_property, Symbol):
             schema = self._build_symbol_schema(_property)
         else:

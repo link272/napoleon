@@ -36,14 +36,19 @@ class Container(Property):
         return self._type()
 
 
-class List(Container):
+class Collection(Container):
+
+    __slots__ = ()
+
+
+class List(Collection):
 
     unique = False
     __slots__ = ()
     _type = list
 
 
-class Set(List):  # noqa
+class Set(Collection):
 
     unique = True
     __slots__ = ()

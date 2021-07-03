@@ -10,7 +10,19 @@ class Scalar(Property):  # noqa
 
     __slots__ = ()
 
+    def from_primitive(self, value):  # noqa
+        return value
+
+    def to_primitive(self, value):  # noqa
+        return value
+
     def from_string(self, value):
+        raise NotImplementedError
+
+    def to_string(self, value):
+        raise NotImplementedError
+
+    def to_bytes(self, value):
         raise NotImplementedError
 
 
@@ -24,6 +36,12 @@ class Boolean(Scalar):
 
     def from_string(self, value):
         return bool(value)
+
+    def to_string(self, value):
+        return str(value)
+
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
 
 
 class Float(Scalar):
@@ -55,6 +73,12 @@ class Float(Scalar):
     def from_string(self, value):
         return float(value)
 
+    def to_string(self, value):
+        return str(value)
+
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
+
 
 class Integer(Float):
 
@@ -66,6 +90,12 @@ class Integer(Float):
 
     def from_string(self, value):
         return int(value)
+
+    def to_string(self, value):
+        return str(value)
+
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
 
 class Symbol(Scalar):  # noqa
 
@@ -84,8 +114,8 @@ class Symbol(Scalar):  # noqa
         self.pattern = pattern
         self.format = format
 
-    def to_string(self, value):
-        raise NotImplementedError
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
 
 
 class String(Symbol):
@@ -125,8 +155,11 @@ class String(Symbol):
     def from_string(self, value):
         return str(value)
 
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
 
-class Bytes(Symbol):
+
+class Bytes(Scalar):
 
     __slots__ = ()
     _type = bytes
@@ -134,32 +167,34 @@ class Bytes(Symbol):
     def system_default(self):
         return b""
 
-    def to_string(self, value):
-        return self.to_bytes(value).decode()
-
-    def from_string(self, value):
-        return self.from_bytes(value.encode())
-
     def to_bytes(self, value):
         return base64.urlsafe_b64encode(value)
 
     def from_bytes(self, value):
         return base64.urlsafe_b64decode(value)
 
+    def to_string(self, value):
+        return self.to_bytes(value).decode()
 
-class JSON(Bytes):
+    def from_string(self, value):
+        return self.from_bytes(value.encode())
+
+
+class Blob(Scalar):
+
+    __slots__ = ()
+
+    def system_default(self):
+        return Nothing
+
+
+class JSON(Scalar):
 
     __slots__ = ()
     _type = dict
 
     def system_default(self):
-        return Nothing
-
-    def to_string(self, value):
-        return json.dumps(value)
-
-    def from_string(self, value):
-        return json.loads(value)
+        return self._type()
 
     def to_bytes(self, value):
         return to_bson(value)
@@ -167,8 +202,14 @@ class JSON(Bytes):
     def from_bytes(self, value):
         return from_bson(value)
 
+    def from_string(self, value):
+        return json.loads(value)
 
-class DateTime(String):
+    def to_string(self, value):
+        return json.dumps(value)
+
+
+class DateTime(Symbol):
 
     __slots__ = ()
     _type = pendulum.DateTime
@@ -184,17 +225,20 @@ class DateTime(String):
             nullable=nullable
         )
 
+    def from_string(self, value):
+        return pendulum.parse(value)
+
     def system_default(self):
         return Nothing
 
     def to_string(self, value):  # iso8601
         return value.isoformat()
 
-    def from_string(self, value):
-        return pendulum.parse(value)
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
 
 
-class UUID(Bytes):
+class UUID(Symbol):
 
     __slots__ = ()
     _type = uuid.UUID
@@ -220,7 +264,7 @@ class UUID(Bytes):
         return uuid.UUID(value)
 
     def to_bytes(self, value):
-        return super().to_bytes(value.bytes)
+        return base64.urlsafe_b64encode(value.bytes)
 
     def from_bytes(self, value):
-        return uuid.UUID(bytes=super().from_bytes(value))
+        return uuid.UUID(bytes=base64.urlsafe_b64decode(value))

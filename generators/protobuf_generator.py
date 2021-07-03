@@ -1,5 +1,5 @@
 import hashlib
-from ..properties import Instance, List, Set, Map, Integer, Float, DateTime, Boolean, String, Bytes, SlottedType, Symbol
+from ..properties import Instance, List, Set, Map, Integer, Float, DateTime, Boolean, String, Bytes, SlottedType, Blob, JSON
 from ..properties.base import recurse_iter_properties, PlaceHolder
 from ..tools.singleton import Nothing, exist, is_define, Undefined
 from ..properties.objects import AbstractObject
@@ -95,13 +95,11 @@ class ProtobufModel(object):
             _type = "double"
         elif isinstance(_property, DateTime):
             _type = "google.protobuf.Timestamp"
-        elif isinstance(_property, Bytes):
-            _type = "bytes"
         elif isinstance(_property, Boolean):
             _type = "bool"
         elif isinstance(_property, String):
             _type = "string"
-        elif isinstance(_property, Symbol):
+        elif isinstance(_property, (Blob, JSON, Bytes)):
             _type = "bytes"
         elif isinstance(_property, PlaceHolder):
             _type = Nothing

@@ -1,6 +1,6 @@
 from ..properties.container import List, Set, Map, Container
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, Boolean, Bytes, DateTime, String
+from ..properties.scalars import Float, Integer, Boolean, Bytes, DateTime, String, UUID, Blob
 from ..properties.base import PlaceHolder, iter_properties
 from ..tools.singleton import Nothing, exist
 from .base import BaseEncoder
@@ -23,12 +23,10 @@ class ProtobufEncoder(BaseEncoder):
             head = self._encode_sequence(_property, base)
         elif isinstance(_property, Map):
             head = self._encode_mapping(_property, base)
-        elif isinstance(_property, (Float, Integer, Boolean, DateTime)):
-            head = base
-        elif isinstance(_property, Bytes):
+        elif isinstance(_property, (Float, Integer, Boolean, String, DateTime)):
+            head = _property.to_primitive(base)
+        elif isinstance(_property, (Bytes, UUID, Blob)):
             head = _property.to_bytes(base)
-        elif isinstance(_property, String):
-            head = _property.to_string(base)
         elif isinstance(_property, PlaceHolder):
             head = Nothing
         else:

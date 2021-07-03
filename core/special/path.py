@@ -19,8 +19,14 @@ class FilePath(String):
     def system_default(self):
         return Nothing
 
-    def to_string(self, value):
+    def to_primitive(self, value):
         return str(value)
 
-    def from_string(self, value):
+    def from_primitive(self, value):
         return Path(value) if value else Nothing
+
+    def from_string(self, value):
+        return self.from_primitive(value)
+
+    def to_string(self, value):
+        return self.to_primitive(value)

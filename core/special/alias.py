@@ -54,8 +54,8 @@ class Alias(String, Descriptor):
     def to_string(self, value):
         return invert_map(getattr(Application(), self.item_type.__name__.lower() + "s"))[value]
 
-    def from_string(self, value):
-        return value
+    def to_primitive(self, value):
+        return self.to_string(value)
 
 
 class LazySet(object):
@@ -100,5 +100,5 @@ class MapAlias(Set, Descriptor):
         _invert = invert_map(getattr(Application(), self.item_class.__name__.lower() + "s"))
         return [_invert[v] for v in values]
 
-    def from_string(self, value):
-        return value
+    def to_primitive(self, value):
+        return self.to_string(value)

@@ -1,6 +1,6 @@
-from ..properties.container import List, Set, Map
+from ..properties.container import Collection, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, JSON, Boolean, Symbol
+from ..properties.scalars import Blob, JSON, Symbol, Float, Integer, Boolean, String
 from ..properties.base import recurse_iter_properties, PlaceHolder
 from ..tools.singleton import Nothing, Undefined, exist, is_define
 from .base import BaseMerger
@@ -13,41 +13,37 @@ class JSONMerger(BaseMerger):
         super().__init__()
         self.decoder = JSONDecoder()
 
-    def _dispatch_update(self, _property, base, root):
-        if root is None or not exist(root) or not is_define(root):
-            head = self.decoder._dispatch(_property, base) # noqa
-        elif root is None or not exist(root) or not is_define(root):
-            head = _property.system_default()
+    def _dispatch_update(self, _property, root, source):
+        if source is None:
+            target = Nothing
+        elif not exist(root):
+            target = self.decoder._dispatch(_property, root, source) # noqa
         elif isinstance(_property, Instance):
-            head = self._decode_instance(_property, base, root)
-        elif isinstance(_property, List):
-            head = self._decode_list(_property, base, root)
-        elif isinstance(_property, Set):
-            head = self._decode_set(_property, base, root)
+            target = self._decode_instance(_property, root, source)
+        elif isinstance(_property, Collection):
+            target = self._decode_collection(_property, root, source)
         elif isinstance(_property, Map):
-            head = self._decode_mapping(_property, base, root)
-        elif isinstance(_property, (Float, Integer, Boolean, JSON)):
-            head = base
-        elif isinstance(_property, Symbol):
-            head = _property.from_string(base)
+            target = self._decode_mapping(_property, root, source)
+        elif isinstance(_property, (JSON, Float, Integer, Boolean, String)):
+            target = _property.from_primitive(source)
+        elif isinstance(_property, (Blob, Symbol)):
+            target = _property.from_string(source)
         elif isinstance(_property, PlaceHolder):
-            head = Nothing
+            target = Nothing
         else:
             raise RuntimeError(f"{_property} is not implemented")
-        return head
+        return target
 
-    def _decode_instance(self, _property, component, root):
+    def _decode_instance(self, _property, root, source):
         instance = dict()
         for k, prop in recurse_iter_properties(_property.object_type):
-            base = component.get(k, Undefined)
-            attr = getattr(root, k, Nothing)
-            if is_define(base):
-                head = self._dispatch_update(prop, base, attr)
-                if exist(head):
-                    instance[k] = head
+            head = source.get(k, Undefined)
+            base = getattr(root, k, Nothing)
+            if is_define(head):
+                instance[k] = self._dispatch_update(prop, base, head)
         return root.update(**instance)
 
-    def _decode_list(self, _property, base, root):
+    def _decode_collection(self, _property, base, root):
         if isinstance(_property.item_type, Instance):
             for v1 in root:
                 k1 = getattr(v1, _property.merge_on)
@@ -62,10 +58,7 @@ class JSONMerger(BaseMerger):
             res = root
         else:
             res = self.decoder._dispatch(_property, base) # noqa
-        return res
-
-    def _decode_set(self, _property, base, root):
-        return set(self._decode_list(_property, base, root))
+        return _property._type(res)
 
     def _decode_mapping(self, _property, base, root):
         for k2, v2 in base.items():

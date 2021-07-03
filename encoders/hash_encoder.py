@@ -1,6 +1,6 @@
 from ..properties.container import List, Set, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, Boolean, Symbol, UUID
+from ..properties.scalars import Scalar
 from ..properties.base import PlaceHolder, iter_properties
 from ..tools.singleton import Nothing, exist, is_define
 from .base import BaseEncoder
@@ -21,12 +21,8 @@ class HashEncoder(BaseEncoder):
             self._encode_sequence(_property, base, _hash)
         elif isinstance(_property, Map):
             self._encode_mapping(_property, base, _hash)
-        elif isinstance(_property, (Float, Integer, Boolean)):
-            _hash.update(str(base).encode())
-        elif isinstance(_property, UUID):
-            _hash.update(base.bytes)
-        elif isinstance(_property, Symbol):
-            _hash.update(_property.to_string(base).encode())
+        elif isinstance(_property, Scalar):
+            _hash.update(_property.to_bytes(base))
         elif isinstance(_property, PlaceHolder):
             pass
         else:
