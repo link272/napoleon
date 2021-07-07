@@ -1,6 +1,6 @@
 from flask import Flask, request
 import secrets
-from napoleon.properties import PlaceHolder, Boolean, String
+from napoleon.properties import PlaceHolder, Boolean, String, AbstractObject, Instance, Integer, List
 from napoleon.core.network.http import HTTPQuery
 from napoleon.core.network.client import Client
 from napoleon.core.application import Application
@@ -11,6 +11,14 @@ from napoleon.core.special.alias import Alias
 
 import threading
 from pathlib import Path
+from flask_cors import CORS
+from flask_cachebuster import CacheBuster
+
+
+class StaticCache(AbstractObject):
+
+    hash_size = Integer(5)
+    extensions = List(String(), ['.js', '.css'])
 
 
 class FlaskServer(ThreadedServer):
@@ -24,6 +32,8 @@ class FlaskServer(ThreadedServer):
     crt_filepath = FilePath(lambda: Application().paths.docs / Path("crt.pem"))
     template_folder = FilePath(lambda: Application().paths["templates"])
     static_folder = FilePath(lambda: Application().paths["static"])
+    enable_cors = Boolean(default=False)
+    static_cache = Instance(StaticCache)
 
     def _build_internal(self):
         self.app = self.build_app()
@@ -58,6 +68,14 @@ class FlaskServer(ThreadedServer):
         flask_app = Flask(__name__,
                           template_folder=str(self.template_folder),
                           static_folder=str(self.static_folder))
+        if self.enable_cors:
+            CORS(flask_app)
+
+        if exist(self.static_cache):
+            config = self.static_cache.serialize()
+            cache_buster = CacheBuster(config=config)
+            cache_buster.init_app(flask_app)
+
         flask_app.secret_key = self.secret_key
 
         @flask_app.route('/shutdown/<token>', methods=['POST'])
