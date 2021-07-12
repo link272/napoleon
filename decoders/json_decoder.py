@@ -10,7 +10,7 @@ class JSONDecoder(BaseDecoder):
 
     def _dispatch(self, _property, source):
         if source is None:
-            target = Nothing
+            target = None
         elif isinstance(_property, Instance):
             target = self._decode_instance(_property, source)
         elif isinstance(_property, Collection):

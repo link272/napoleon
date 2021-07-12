@@ -15,7 +15,7 @@ class JSONMerger(BaseMerger):
 
     def _dispatch_update(self, _property, root, source):
         if source is None:
-            target = Nothing
+            target = None
         elif not exist(root):
             target = self.decoder._dispatch(_property, root, source) # noqa
         elif isinstance(_property, Instance):

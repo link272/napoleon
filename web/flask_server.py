@@ -18,7 +18,7 @@ from flask_cachebuster import CacheBuster
 class StaticCache(AbstractObject):
 
     hash_size = Integer(5)
-    extensions = List(String(), ['.js', '.css'])
+    extensions = List(String(), default=['.js', '.css'])
 
 
 class FlaskServer(ThreadedServer):
@@ -66,8 +66,8 @@ class FlaskServer(ThreadedServer):
 
     def build_base_app(self):
         flask_app = Flask(__name__,
-                          template_folder=str(self.template_folder),
-                          static_folder=str(self.static_folder))
+                          template_folder=str(self.template_folder) if exist(self.template_folder) else "",
+                          static_folder=str(self.static_folder) if exist(self.static_folder) else "")
         if self.enable_cors:
             CORS(flask_app)
 
@@ -78,13 +78,17 @@ class FlaskServer(ThreadedServer):
 
         flask_app.secret_key = self.secret_key
 
+        self.build_shutdown_mechanism(flask_app)
+
+        return flask_app
+
+    def build_shutdown_mechanism(self, flask_app):
+
         @flask_app.route('/shutdown/<token>', methods=['POST'])
         def shutdown(token):
             if secrets.compare_digest(self._shutdown_token, token):
                 request.environ.get('werkzeug.server.shutdown')()
             return "", 204
-
-        return flask_app
 
     def add_view(self, view, route):
         self.app.add_url_rule(route, view_func=view)
