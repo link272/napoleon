@@ -52,7 +52,7 @@ class AbstractObject(object, metaclass=SlottedType):
         self._clean_internal()
 
     def copy(self):
-        return copy.deepcopy(self)
+        return self.__class__.deserialize(self.serialize())
 
     def serialize(self):
         return JSONEncoder().encode(self)

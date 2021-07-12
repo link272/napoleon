@@ -44,7 +44,7 @@ class Timer(AbstractObject):
         return exist(self._internal_clock) and self._internal_clock.is_alive()
 
     def __enter__(self):
-        self._is_timed_out.clear()
+        self._is_timed_out = threading.Event()
         self._internal_clock = threading.Timer(self.delay, self._is_timed_out.set)
         self._internal_clock.start()
 

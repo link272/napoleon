@@ -41,7 +41,7 @@ class ThreadedServer(AbstractDaemon):
             try:
                 self._stop_thread()
             except Exception as ex:
-                self.log.error(f"Failed to stop the server: {ex}")
+                self.log.exception(f"Failed to stop the server: {ex}")
             else:
                 time.sleep(self.grace_delay)
                 if self.is_active:
