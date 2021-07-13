@@ -53,7 +53,7 @@ class IntrinsicType(object):
 
     def __new__(cls):
         if IntrinsicType._singleton is None:
-            UndefinedType._singleton = super(IntrinsicType, cls).__new__(cls)
+            IntrinsicType._singleton = super(IntrinsicType, cls).__new__(cls)
         return IntrinsicType._singleton
 
     def __str__(self):
