@@ -1,6 +1,6 @@
 from ..properties.container import List, Set, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Float, Integer, JSON, Boolean, String, Blob, Symbol
+from ..properties.scalars import Float, Integer, JSON, Boolean, String, Blob, Symbol, Decimal
 from ..properties.base import PlaceHolder, iter_properties
 from ..tools.singleton import Nothing, exist
 from .base import BaseEncoder
@@ -17,7 +17,7 @@ class JSONEncoder(BaseEncoder):
             head = self._encode_mapping(_property, base)
         elif isinstance(_property, (Float, Integer, Boolean, JSON, String)):
             head = _property.to_primitive(base)
-        elif isinstance(_property, (Blob, Symbol)):
+        elif isinstance(_property, (Blob, Symbol, Decimal)):
             head = _property.to_string(base)
         elif isinstance(_property, PlaceHolder):
             head = Nothing

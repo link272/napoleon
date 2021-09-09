@@ -5,6 +5,7 @@ from ..tools.singleton import Undefined, Intrinsic, Nothing
 from ..tools.bson import to_bson, from_bson
 import json
 import base64
+import decimal
 
 class Scalar(Property):  # noqa
 
@@ -72,6 +73,29 @@ class Float(Scalar):
 
     def from_string(self, value):
         return float(value)
+
+    def to_string(self, value):
+        return str(value)
+
+    def to_bytes(self, value):
+        return base64.urlsafe_b64encode(self.to_string(value).encode())
+
+
+class Decimal(Float):
+
+    _type = decimal.Decimal
+
+    def from_primitive(self, value):  # noqa
+        return decimal.Decimal(value)
+
+    def to_primitive(self, value):  # noqa
+        return str(value)
+
+    def system_default(self):
+        return decimal.Decimal()
+
+    def from_string(self, value):
+        return decimal.Decimal(value)
 
     def to_string(self, value):
         return str(value)

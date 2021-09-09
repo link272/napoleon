@@ -1,6 +1,6 @@
 from ..properties.container import Collection, Map
 from ..properties.instance import Instance
-from ..properties.scalars import Blob, JSON, Symbol, Float, Integer, Boolean, String
+from ..properties.scalars import Blob, JSON, Symbol, Float, Integer, Boolean, String, Decimal
 from ..properties.base import recurse_iter_properties, PlaceHolder
 from ..tools.singleton import Undefined, exist, is_define, Nothing
 from .base import BaseDecoder
@@ -19,7 +19,7 @@ class JSONDecoder(BaseDecoder):
             target = self._decode_mapping(_property, source)
         elif isinstance(_property, (JSON, Float, Integer, Boolean, String)):
             target = _property.from_primitive(source)
-        elif isinstance(_property, (Blob, Symbol)):
+        elif isinstance(_property, (Blob, Symbol, Decimal)):
             target = _property.from_string(source)
         elif isinstance(_property, PlaceHolder):
             target = Nothing
