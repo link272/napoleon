@@ -1,0 +1,22 @@
+clients:
+  test_server:
+    class_name: HTTPClient
+    scheme: http
+    host: localhost
+    port: 8080
+    name: test_server
+tracers:
+  default:
+    class_name: StreamTracer
+    level: INFO
+    name: default
+paths:
+  templates: {{ cwd }}/tests/config
+  data: /tmp
+  temporary: /tmp
+  log: /tmp
+  config: {{ cwd }}/tests/config
+vault:
+  default:
+      class_name: FernetVault
+      key: {{ cwd }}/tests/config/secret

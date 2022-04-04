@@ -1,0 +1,7 @@
+clients:
+  test_server:
+    class_name: HTTPClient
+    scheme: http
+    host: localhost
+    port: 8080
+    name: test_server
