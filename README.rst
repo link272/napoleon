@@ -8,8 +8,6 @@ Napoleon help you build better python application
 Supports Python **3.10**.
 
 
-..code-block:: python
-
    >>> from napoleon import AbstractObject, Integer, retry, String
    >>> 
    >>> class Vehicle(AbstractObject):
