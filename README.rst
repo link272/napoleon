@@ -3,6 +3,8 @@ Napoleon
 
 Dicebat Bernardus Carnotensis nos esse quasi nanos, gigantium humeris insidentes, ut possimus  plura  eis  et  remotiora  videre,  non  utique  proprii  visus  acumine,  aut  eminentia  corporis, sed quia in altum subvenimur et extollimur magnitudine gigantea
 
+Bernard of Chartres used to compare us to dwarfs perched on the shoulders of giants. He pointed out that we see more and farther than our predecessors, not because we have keener vision or greater height, but because we are lifted up and borne aloft on their gigantic stature.
+
 Napoleon help you build better python application
 
 Supports Python **3.10**.
