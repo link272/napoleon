@@ -6,3 +6,4 @@ from napoleon.core.vault.fernet import FernetVault
 from napoleon.properties import AbstractObject, Float, Integer, String, Boolean, Bytes, JSON, UUID, DateTime, \
     PlaceHolder, List, Map, Set, Instance, Decimal
 from napoleon.tools.singleton import Nothing, exist, Undefined, is_define
+from napoleon.core.decorator.retry import retry

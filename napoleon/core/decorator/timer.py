@@ -19,11 +19,13 @@ class Timer(MethodWrapper):
     def __call__(self, *args, **kwargs):
         result = None
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=self.timeout)
-        while flag := datetime.datetime.now() < timeout:
+        ok = True
+        while ok:
             try:
                 result = self.method(*args, **kwargs)
             except Exception as e:
-                if flag:
+                ok = datetime.datetime.now() < timeout
+                if ok:
                     time.sleep(self.delay)
                 else:
                     raise e

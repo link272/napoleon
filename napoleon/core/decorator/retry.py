@@ -13,11 +13,11 @@ class Retrier(MethodWrapper):
     def __call__(self, *args, **kwargs):
         result = None
         count = 0
-        while flag := count <= self.max_retry:
+        while count < self.max_retry:
             try:
                 result = self.method(*args, **kwargs)
             except Exception as e:  # noqa
-                if flag:
+                if count < self.max_retry - 1:
                     time.sleep(self.delay)
                     count += 1
                 else:
